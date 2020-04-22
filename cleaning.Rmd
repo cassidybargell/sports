@@ -210,5 +210,7 @@ usahockey_tml <- get_timeline("usahockey", n = 3200)
 
 file.create("usahockey_tml.RDS")
 saveRDS(usahockey_tml, file = "sport-perceptions/raw-data/usahockey_tml.RDS")
+
+bruh <- readRDS("sport-perceptions/raw-data/bootstrap_football.RDS")
 ```
 

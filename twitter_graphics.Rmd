@@ -34,11 +34,14 @@ rugby <- readRDS("sport-perceptions/raw-data/rugby.RDS")
 nfl_tml <- readRDS("sport-perceptions/raw-data/nfl_tml.RDS")
 wr_tml <- readRDS("sport-perceptions/raw-data/wr_tml.RDS")
 sr_tml <- readRDS("sport-perceptions/raw-data/sr_tml.RDS")
+usarugby_tml <- readRDS("sport-perceptions/raw-data/usarugby_tml.RDS")
+usahockey_tml <- readRDS("sport-perceptions/raw-data/usahockey_tml.RDS")
+ussoccer_tml <- readRDS("sport-perceptions/raw-data/ussoccer_tml.RDS")
+hockey <- readRDS("sport-perceptions/raw-data/hockey.RDS")
+soccer <- readRDS("sport-perceptions/raw-data/soccer.RDS")
 ```
 
 ```{r nfl_tml words}
-nfl_tml %>%
-  select(created_at, text, favorite_count, quote_count, retweet_count, reply_count) 
 
 # Remove urls in tweets, and create list of words I want to search the tweets
 # for. Capitalization are recognized separately.
@@ -110,11 +113,17 @@ football_clean <- tweetclean(football)
 sr_clean <- tweetclean(sr_tml)
 wr_clean <- tweetclean(wr_tml)
 rugby_clean <- tweetclean(rugby)
+usarugby_tml_clean <- tweetclean(usarugby_tml)
+usahockey_tml_clean <- tweetclean(usahockey_tml)
+ussoccer_tml_clean <- tweetclean(ussoccer_tml)
+hockey_clean <- tweetclean(hockey)
+soccer_clean <- tweetclean(soccer)
 ```
 
 ```{r paired words}
 
-# Search for paired words like head-injury
+# Search for paired words like head-injury. Don't know if I will use this for
+# anything.
 
 football_paired_words <- football %>%
   select(stripped_text) %>%
@@ -131,12 +140,9 @@ football_filtered <- football_separated_words %>%
   filter(!word2 %in% stop_words$word)
 
 # new bigram counts:
+
 football_words_counts <- football_filtered %>%
   count(word1, word2, sort = TRUE)
-
-# cces %>% 
-  # filter(gender == "Female") %>%
-  # summarize(prop =  sum(trump == 1) / n())
 ```
 
 ```{r}
@@ -144,7 +150,7 @@ football_words_counts <- football_filtered %>%
 # Try to find proportions of cleaned tweets, can then bootstrap resample. 
 
 football_prop <- football_clean %>%
-  count(contains_word = (word == "concussion" | word == "concussions" | word == "cte" | word == "head" | word == "injury" |  word == "injuries")) %>%
+  count(contains_word = (word == "concussion" | word == "concussions" | word == "cte" | word == "injury" |  word == "injuries")) %>%
   mutate(total = sum(n)) %>%
   filter(contains_word == 'TRUE') %>%
   mutate(prop = (n / total) * 100)
@@ -154,7 +160,7 @@ football_prop <- football_clean %>%
 
 proportion_words <- function(tib){
   tib %>%
-  count(contains_word = (word == "concussion" | word == "concussions" | word == "cte" | word == "head" | word == "injury" |  word == "injuries")) %>%
+  count(contains_word = (word == "concussion" | word == "concussions" | word == "cte" | word == "injury" |  word == "injuries")) %>%
   mutate(total = sum(n)) %>%
   filter(contains_word == 'TRUE') %>%
   mutate(prop = (n / total) * 100)
@@ -164,24 +170,34 @@ rugby_prop <- proportion_words(rugby_clean)
 sr_prop <- proportion_words(sr_clean)
 wr_prop <- proportion_words(wr_clean)
 nfl_prop <- proportion_words(nfl_tml_clean)
+usarugby_prop <- proportion_words(usarugby_tml_clean) 
+usahockey_prop <- proportion_words(usahockey_tml_clean)
+ussoccer_prop <- proportion_words(ussoccer_tml_clean)
+hockey_prop <- proportion_words(hockey_clean)
+soccer_prop <- proportion_words(soccer_clean)
 ```
 
 ```{r bootstrap resample, cache = TRUE}
 
-# Bootstrap resample the football data
+# Bootstrap re-sample the football data
 
 bootstrap_football <- football %>%
-  rep_sample_n(size = 4000, replace = TRUE, reps = 100) %>%
+  rep_sample_n(size = 4000, replace = TRUE, reps = 1000) %>%
   tweetclean() %>%
   group_by(replicate) %>%
   proportion_words() %>%
-  select(replicate, n, total, prop)
+  ungroup() %>%
+  pull(prop) %>%
+  quantile(c(0.025, 0.975))
 
-# Create function to boostrap the words more easily
+file.create("bootstrap_football.RDS")
+saveRDS(bootstrap_football, file = "sport-perceptions/raw-data/bootstrap_football.RDS")
+
+# Create function to bootstrap the words more easily
 
 bootstrap_prop <- function(tib){
   tib %>%
-  rep_sample_n(size = 4000, replace = TRUE, reps = 3) %>%
+  rep_sample_n(size = 4000, replace = TRUE, reps = 1000) %>%
   tweetclean() %>%
   group_by(replicate) %>%
   proportion_words() %>%
@@ -196,6 +212,38 @@ bootstrap_rugby <- bootstrap_prop(rugby)
 bootstrap_sr <- bootstrap_prop(sr_tml)
 bootstrap_wr <- bootstrap_prop(wr_tml)
 bootstrap_nfl <- bootstrap_prop(nfl_tml)
+bootstrap_usarugby <- bootstrap_prop(usarugby_tml)
+bootstrap_usahockey <- bootstrap_prop(usahockey_tml)
+bootstrap_ussoccer <- bootstrap_prop(ussoccer_tml)
+bootstrap_soccer <- bootstrap_prop(soccer)
+bootstrap_hockey <- bootstrap_prop(hockey)
+
+file.create("bootstrap_rugby.RDS")
+saveRDS(bootstrap_rugby, file = "sport-perceptions/raw-data/bootstrap_rugby.RDS")
+
+file.create("bootstrap_sr.RDS")
+saveRDS(bootstrap_sr, file = "sport-perceptions/raw-data/bootstrap_sr.RDS")
+
+file.create("bootstrap_wr.RDS")
+saveRDS(bootstrap_wr, file = "sport-perceptions/raw-data/bootstrap_wr.RDS")
+
+file.create("bootstrap_nfl.RDS")
+saveRDS(bootstrap_nfl, file = "sport-perceptions/raw-data/bootstrap_nfl.RDS")
+
+file.create("bootstrap_usarugby.RDS")
+saveRDS(bootstrap_usarugby, file = "sport-perceptions/raw-data/bootstrap_usarugby.RDS")
+
+file.create("bootstrap_usahockey.RDS")
+saveRDS(bootstrap_usahockey, file = "sport-perceptions/raw-data/bootstrap_usahockey.RDS")
+
+file.create("bootstrap_ussoccer.RDS")
+saveRDS(bootstrap_ussoccer, file = "sport-perceptions/raw-data/bootstrap_ussoccer.RDS")
+
+file.create("bootstrap_soccer.RDS")
+saveRDS(bootstrap_soccer, file = "sport-perceptions/raw-data/bootstrap_soccer.RDS")
+
+file.create("bootstrap_hockey.RDS")
+saveRDS(bootstrap_hockey, file = "sport-perceptions/raw-data/bootstrap_hockey.RDS")
 ```
 
 
