@@ -165,7 +165,7 @@ wr_prop <- proportion_words(wr_clean)
 nfl_prop <- proportion_words(nfl_tml_clean)
 ```
 
-```{r bootstrap resample}
+```{r bootstrap resample, cache = TRUE}
 
 # Bootstrap resample the football data
 
