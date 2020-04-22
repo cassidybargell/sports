@@ -10,11 +10,12 @@
 library(shiny)
 library(tidyverse)
 library(shinythemes)
+library(readr)
 
 # Create variables for ggplot
 
-rugby_merged <- read_rds("raw-data/rugby_merged.RDS")
-
+sports <- read_rds("raw-data/sports.RDS")
+organ <- read_rds("raw-data/organ.RDS")
 
 
 ui <- navbarPage(
@@ -51,10 +52,18 @@ ui <- navbarPage(
     #### DATA
 
     tabPanel("Graphics",
-             tabPanel("Graphics",
-                      h3("First Plot:"),
-                      plotOutput("plot_rgsearch"),
-             )),
+             tabsetPanel(
+             tabPanel("Proportions of Tweets",
+                      h3("Associations of Tweeting About a Sport and Injuries"),
+                      sidebarPanel(
+                          helpText("Select to compare between a all tweets, timelines from organizations, or between sports"),
+                          span(),
+                          selectInput("plot1", "Different Comparisons:",
+                                      choices = list("Sports" = "sports",
+                                                     "Organizations" = "organ"),
+                                      selected = "Sports")),
+                      mainPanel(plotOutput("proportions_plot"))))))
+
 
     #### FOOTNOTES
 
@@ -69,7 +78,7 @@ ui <- navbarPage(
 
              p("I got my data from ... "),
              p("github link ... ")
-    ))
+    )
 
 
 
@@ -78,27 +87,30 @@ server <- function(input, output) {
 
     #### DATA
 
-    output$plot_rgsearch <- renderPlot({
-        ggplot(rugby_merged, aes(x = long, y = lat)) +
-            geom_polygon(aes(group = group,
-                             fill = log(hits)),
-                         colour = "white") +
-            scale_fill_viridis_c(option = "plasma",
-                                 direction = -1) +
-            theme_minimal() +
-            labs(title = "Google Search Hits for 'Rugby' Since 2004",
-                 subtitle = "Search Hits Normalized to Compare Relative Popularity",
-                 caption = "Google Trends: Search results are normalized to the time and
-       location of a query. Each data point is divided by the total searches of
-       the geography and time range it represents to compare relative popularity.") +
-            theme(axis.title = element_blank()) +
-            theme(axis.text = element_blank()) +
-            theme(axis.ticks = element_blank()) +
-            theme(legend.title = element_blank()) +
-            theme(panel.grid.major = element_blank())
+    output$proportions_plot <- renderPlot({if(input$plot1 == "sports"){
+        ggplot(sports, aes(x = sport, y = prop, fill = sport)) + geom_col() +
+            geom_errorbar(aes(x = sport, ymin = lower, ymax = upper)) +
+            theme_classic() +
+            theme(legend.position = "none") +
+            labs(title = "Proportion of Sports Tweet Containing Words Related to Injury",
+                 subtitle = "Words Searched For: concussion(s), injury(ies), CTE",
+                 caption = "From sample of 4,000 random tweets containing reference to the specific sport, scraped on 4/22/20
+       Error bars = 95% confidence interval",
+                 x = "Sport",
+                 y = "Proportion (in %)")
+    } else if(input$plot1 == "organ"){ggplot(organ, aes(x = organization, y = prop, fill = organization)) + geom_col() +
+            geom_errorbar(aes(x = organization, ymin = lower, ymax = upper)) +
+            theme_classic() +
+            theme(legend.position = "none") +
+            labs(title = "Proportion of Sports Tweet Containing Words Related to Injury",
+                 subtitle = "Words Searched For: concussion(s), injury(ies), CTE",
+                 caption = "3,200 most recent tweets from a given organization's verified twitter account, scraped on 4/22/20
+       Error bars = 95% confidence interval",
+                 x = "Organization",
+                 y = "Proportion (in %)")
+    }
 
-    })
-
+})
 }
 
 # Run the application
