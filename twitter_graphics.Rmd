@@ -17,6 +17,7 @@ library(pals)
 library(viridis)
 library(scico)
 library(ggrepel)
+library(infer)
 library(tidyr)
 library(stringr)
 library(tidytext)
@@ -163,4 +164,30 @@ sr_prop <- proportion_words(sr_clean)
 wr_prop <- proportion_words(wr_clean)
 nfl_prop <- proportion_words(nfl_tml_clean)
 ```
+
+```{r bootstrap resample}
+
+# Bootstrap resample the football data
+
+football_bootstrap <- football %>%
+  rep_sample_n(size = 4000, replace = TRUE, reps = 100) %>%
+  tweetclean() %>%
+  group_by(replicate) %>%
+  proportion_words() %>%
+  select(replicate, n, total, prop)
+
+# Create function to boostrap the words more easily
+
+bootstrap_prop <- function(tib){
+  tib %>%
+  rep_sample_n(size = 4000, replace = TRUE, reps = 3) %>%
+  tweetclean() %>%
+  group_by(replicate) %>%
+  proportion_words() %>%
+  select(replicate, n, total, prop)
+}
+
+bootstrap_prop(rugby)
+```
+
 
