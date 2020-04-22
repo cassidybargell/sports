@@ -1,0 +1,26 @@
+---
+title: "proportions plots"
+author: "Cassidy Bargell"
+date: "4/22/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(rtweet)
+library(httpuv)
+library(gtrendsR)
+library(lubridate)
+library(maps)
+library(pals)
+library(viridis)
+library(scico)
+library(ggrepel)
+library(infer)
+library(tidyr)
+library(stringr)
+library(tidytext)
+library(widyr)
+```
+
