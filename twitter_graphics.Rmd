@@ -72,13 +72,13 @@ football %>%
 football$stripped_text <- gsub("http.*","",  football$text)
 football$stripped_text <- gsub("https.*","", football$stripped_text)
 
-nfl_tml_clean <- nfl_tml %>%
+football_clean <- football %>%
   select(stripped_text) %>%
   unnest_tokens(word, stripped_text) 
 
 # Get rid of pre-loaded group of words that have no context
 
-nfl_tml_clean <- nfl_tml_clean %>%
+football_clean <- football_clean %>%
   anti_join(stop_words, by = "word")
 ```
 
@@ -251,8 +251,6 @@ saveRDS(bootstrap_hockey, file = "sport-perceptions/raw-data/bootstrap_hockey.RD
 ```{r plots}
 
 # Add column with sport/organization to keep track of rows with joines
-
-bootstrap_football <- read_rds()
 
 football_error <- as_tibble(bootstrap_football) %>%
   mutate(error = c("lower", "upper")) %>%
