@@ -177,7 +177,7 @@ hockey_prop <- proportion_words(hockey_clean)
 soccer_prop <- proportion_words(soccer_clean)
 ```
 
-```{r bootstrap resample, cache = TRUE}
+```{r bootstrap resample, cache = TRUE, eval = FALSE}
 
 # Bootstrap re-sample the football data
 
@@ -244,6 +244,91 @@ saveRDS(bootstrap_soccer, file = "sport-perceptions/raw-data/bootstrap_soccer.RD
 
 file.create("bootstrap_hockey.RDS")
 saveRDS(bootstrap_hockey, file = "sport-perceptions/raw-data/bootstrap_hockey.RDS")
+```
+
+
+```{r plots}
+
+# Add column with sport/organization to keep track of rows with joines
+
+football_error <- as_tibble(bootstrap_football) %>%
+  mutate(error = c("lower", "upper")) %>%
+  pivot_wider(names_from = error, values_from = value) %>%
+  mutate(sport = "football")
+
+# Make function to make it easier
+
+error <- function(tib){
+  as_tibble(tib) %>%
+  mutate(error = c("lower", "upper")) %>%
+  pivot_wider(names_from = error, values_from = value) 
+}
+
+# Make confidence interval table for all the variables
+
+rugby_error <- error(bootstrap_rugby) %>%
+  mutate(sport = "rugby")
+sr_error <- error(bootstrap_sr) %>%
+  mutate(organization = "superrugby")
+wr_error <- error(bootstrap_wr) %>%
+  mutate(organization = "worldrugby")
+nfl_error <- error(bootstrap_nfl) %>%
+  mutate(organization = "nfl")
+usarugby_error <- error(bootstrap_usarugby) %>%
+  mutate(organization = "usarugby")
+usahockey_error <- error(bootstrap_usahockey) %>%
+  mutate(organization = "usahockey")
+ussoccer_error <- error(bootstrap_ussoccer) %>%
+  mutate(organization = "ussoccer")
+hockey_error <- error(bootstrap_hockey) %>%
+  mutate(sport = "hockey")
+soccer_error <- error(bootstrap_soccer) %>%
+  mutate(sport = "soccer")
+
+football_prop <- football_prop %>%
+  mutate(sport = "football") 
+rugby_prop <- rugby_prop %>%
+  mutate(sport = "rugby")
+sr_prop <- sr_prop %>%
+  mutate(organization = "superrugby")
+wr_prop <- wr_prop %>%
+  mutate(organization = "worldrugby")
+nfl_prop <- nfl_prop %>%
+  mutate(organization = "nfl")
+usarugby_prop <- usarugby_prop %>%
+  mutate(organization = "usarugby")
+usahockey_prop <- usahockey_prop %>%
+  mutate(organization = "usahockey")
+ussoccer_prop <- ussoccer_prop %>%
+  mutate(organization = "ussoccer")
+hockey_prop <- hockey_prop %>%
+  mutate(sport = "hockey")
+soccer_prop <- soccer_prop %>%
+  mutate(sport = "soccer")
+
+sports_prop <- football_prop %>%
+  full_join(rugby_prop, by = c("prop", "n", "total", "contains_word", "sport")) %>%
+  full_join(hockey_prop, by = c("prop", "n", "total", "contains_word", "sport")) %>%
+  full_join(soccer_prop, by = c("prop", "n", "total", "contains_word", "sport"))
+
+sports_error <- football_error %>%
+  full_join(rugby_error, by = c("lower", "upper", "sport")) %>%
+  full_join(soccer_error, by = c("lower", "upper", "sport")) %>%
+  full_join(hockey_error, by = c("lower", "upper", "sport"))
+
+sports <- sports_prop %>%
+  full_join(sports_error, by = "sport")
+
+ggplot(sports, aes(x = sport, y = prop, fill = sport)) + geom_col() + 
+  geom_errorbar(aes(x = sport, ymin = lower, ymax = upper)) + 
+  theme_classic() + 
+  theme(legend.position = "none") + 
+  labs(title = "Proportion of Sports Tweet Containing Words Related to Injury",
+       subtitle = "Words Searched For: concussion(s), injury(ies), CTE",
+       caption = "From sample of 4,000 random tweets containing reference to the specific sport, scraped on 4/22/20
+       Error bars = 95% confidence interval",
+       x = "Sport", 
+       y = "Proportion (in %)") 
 ```
 
 
