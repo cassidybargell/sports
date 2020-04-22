@@ -113,7 +113,7 @@ plot_rgsearch <- ggplot(rugby_merged, aes(x = long, y = lat)) +
 ```
 
 ```{r tweets, cache = TRUE}
-football <- search_tweets("football", n = 10000, include_rts = FALSE, geocode = usa) %>% 
+football <- search_tweets("football", n = 4000, include_rts = FALSE, geocode = usa) %>% 
   select(user_id, 
          created_at, 
          screen_name, 
@@ -129,7 +129,7 @@ football <- search_tweets("football", n = 10000, include_rts = FALSE, geocode = 
 file.create("football.RDS")
 saveRDS(football, file = "football.RDS")
 
-rugby <- search_tweets("rugby", n = 10000, include_rts = FALSE, geocode = usa) %>% 
+rugby <- search_tweets("rugby", n = 4000, include_rts = FALSE, geocode = usa) %>% 
   select(user_id, 
          created_at, 
          screen_name, 
@@ -147,7 +147,7 @@ saveRDS(rugby, file = "rugby.RDS")
 
 nfl_tml <- get_timeline("NFL", n = 3200)
 wr_tml <- get_timeline("WorldRugby", n = 3200)
-sr <- get_timeline("SuperRugbyNZ", n = 3200)
+sr_tml <- get_timeline("SuperRugbyNZ", n = 3200)
 
 file.create("nfl_tml.RDS")
 saveRDS(nfl_tml, file = "raw-data/nfl_tml.RDS")
@@ -161,4 +161,54 @@ saveRDS(sr, file = "raw-data/sr_tml.RDS")
  # other account/sport ideas = USWNT (soccer), ussoccer, usarugby
 ```
 
+```{r}
+# Scrape twitter to add data for soccer and hockey
+
+soccer <- search_tweets("soccer", n = 4000, include_rts = FALSE, geocode = usa) %>% 
+  select(user_id, 
+         created_at, 
+         screen_name, 
+         text, 
+         is_quote, 
+         is_retweet, 
+         retweet_count, 
+         favorite_count, 
+         quote_count, 
+         reply_count, 
+         hashtags)
+
+file.create("soccer.RDS")
+saveRDS(soccer, file = "sport-perceptions/raw-data/soccer.RDS")
+
+hockey <- search_tweets("hockey", n = 4000, include_rts = FALSE, geocode = usa) %>% 
+  select(user_id, 
+         created_at, 
+         screen_name, 
+         text, 
+         is_quote, 
+         is_retweet, 
+         retweet_count, 
+         favorite_count, 
+         quote_count, 
+         reply_count, 
+         hashtags)
+
+file.create("hockey.RDS")
+saveRDS(hockey, file = "sport-perceptions/raw-data/hockey.RDS")
+
+ussoccer_tml <- get_timeline("ussoccer", n = 3200)
+
+file.create("ussoccer_tml.RDS")
+saveRDS(ussoccer_tml, file = "sport-perceptions/raw-data/ussoccer_tml.RDS")
+
+usarugby_tml <- get_timeline("USARugby", n = 3200)
+
+file.create("usarugby_tml.RDS")
+saveRDS(usarugby_tml, file = "sport-perceptions/raw-data/usarugby_tml.RDS")
+
+usahockey_tml <- get_timeline("usahockey", n = 3200)
+
+file.create("usahockey_tml.RDS")
+saveRDS(usahockey_tml, file = "sport-perceptions/raw-data/usahockey_tml.RDS")
+```
 

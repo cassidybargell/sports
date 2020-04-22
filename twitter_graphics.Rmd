@@ -149,7 +149,8 @@ football_prop <- football_clean %>%
   filter(contains_word == 'TRUE') %>%
   mutate(prop = (n / total) * 100)
 
-# Make function to make that process easier
+# Make function to make that process easier. The final proportion is in
+# percentage.
 
 proportion_words <- function(tib){
   tib %>%
@@ -169,7 +170,7 @@ nfl_prop <- proportion_words(nfl_tml_clean)
 
 # Bootstrap resample the football data
 
-football_bootstrap <- football %>%
+bootstrap_football <- football %>%
   rep_sample_n(size = 4000, replace = TRUE, reps = 100) %>%
   tweetclean() %>%
   group_by(replicate) %>%
@@ -184,10 +185,17 @@ bootstrap_prop <- function(tib){
   tweetclean() %>%
   group_by(replicate) %>%
   proportion_words() %>%
-  select(replicate, n, total, prop)
+  ungroup() %>%
+  pull(prop) %>%
+  quantile(c(0.025, 0.975))
 }
 
-bootstrap_prop(rugby)
+# Bootstrap resample all of the different sources
+
+bootstrap_rugby <- bootstrap_prop(rugby)
+bootstrap_sr <- bootstrap_prop(sr_tml)
+bootstrap_wr <- bootstrap_prop(wr_tml)
+bootstrap_nfl <- bootstrap_prop(nfl_tml)
 ```
 
 
