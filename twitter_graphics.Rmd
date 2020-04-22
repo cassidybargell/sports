@@ -118,6 +118,7 @@ usahockey_tml_clean <- tweetclean(usahockey_tml)
 ussoccer_tml_clean <- tweetclean(ussoccer_tml)
 hockey_clean <- tweetclean(hockey)
 soccer_clean <- tweetclean(soccer)
+nfl_tml_clean <- tweetclean(nfl_tml)
 ```
 
 ```{r paired words}
@@ -251,6 +252,8 @@ saveRDS(bootstrap_hockey, file = "sport-perceptions/raw-data/bootstrap_hockey.RD
 
 # Add column with sport/organization to keep track of rows with joines
 
+bootstrap_football <- read_rds()
+
 football_error <- as_tibble(bootstrap_football) %>%
   mutate(error = c("lower", "upper")) %>%
   pivot_wider(names_from = error, values_from = value) %>%
@@ -341,6 +344,8 @@ saveRDS(sports, file = "sport-perceptions/raw-data/sports.RDS")
 
 file.create("organ.RDS")
 saveRDS(organ, file = "sport-perceptions/raw-data/organ.RDS")
+
+sports <- read_rds("sport-perceptions/raw-data/sports.RDS")
 
 ggplot(sports, aes(x = sport, y = prop, fill = sport)) + geom_col() + 
   geom_errorbar(aes(x = sport, ymin = lower, ymax = upper)) + 

@@ -19,7 +19,7 @@ organ <- read_rds("raw-data/organ.RDS")
 
 
 ui <- navbarPage(
-    "Rugby Perceptions",
+    "Perceptions of Sports and Injuries",
     theme = shinytheme("darkly"),
 
     #### ABOUT
@@ -28,8 +28,8 @@ ui <- navbarPage(
 
              # title and subtitle
 
-             h2("What is the perception of rugby through the United States?", align = "center"),
-             h4(em("How does that compare to the rest of the world?"), align = "center"),
+             h2("How are different sports percieved in terms of injuries?", align = "center"),
+             h4(em("How often are sports and injuries discussed together? How might this impact perception of risks?"), align = "center"),
              br(),
              div(),
 
@@ -56,7 +56,7 @@ ui <- navbarPage(
              tabPanel("Proportions of Tweets",
                       h3("Associations of Tweeting About a Sport and Injuries"),
                       sidebarPanel(
-                          helpText("Select to compare between a all tweets, timelines from organizations, or between sports"),
+                          helpText("Select to compare between:"),
                           span(),
                           selectInput("plot1", "Different Comparisons:",
                                       choices = list("Sports" = "sports",
@@ -92,12 +92,13 @@ server <- function(input, output) {
             geom_errorbar(aes(x = sport, ymin = lower, ymax = upper)) +
             theme_classic() +
             theme(legend.position = "none") +
-            labs(title = "Proportion of Sports Tweet Containing Words Related to Injury",
+            labs(title = "Proportion of Sports Tweets Containing Words Related to Injury",
                  subtitle = "Words Searched For: concussion(s), injury(ies), CTE",
                  caption = "From sample of 4,000 random tweets containing reference to the specific sport, scraped on 4/22/20
        Error bars = 95% confidence interval",
                  x = "Sport",
-                 y = "Proportion (in %)")
+                 y = "Proportion (in %)") +
+            scale_x_discrete(labels = c("Football", "Hockey", "Rugby", "Soccer"))
     } else if(input$plot1 == "organ"){ggplot(organ, aes(x = organization, y = prop, fill = organization)) + geom_col() +
             geom_errorbar(aes(x = organization, ymin = lower, ymax = upper)) +
             theme_classic() +
@@ -107,7 +108,8 @@ server <- function(input, output) {
                  caption = "3,200 most recent tweets from a given organization's verified twitter account, scraped on 4/22/20
        Error bars = 95% confidence interval",
                  x = "Organization",
-                 y = "Proportion (in %)")
+                 y = "Proportion (in %)") +
+            scale_x_discrete(labels = c("NFL", "Super Rugby", "USA Hockey", "USA Rugby", "US Soccer", "World Rugby"))
     }
 
 })
