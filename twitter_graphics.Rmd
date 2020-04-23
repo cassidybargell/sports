@@ -39,6 +39,9 @@ usahockey_tml <- readRDS("sport-perceptions/raw-data/usahockey_tml.RDS")
 ussoccer_tml <- readRDS("sport-perceptions/raw-data/ussoccer_tml.RDS")
 hockey <- readRDS("sport-perceptions/raw-data/hockey.RDS")
 soccer <- readRDS("sport-perceptions/raw-data/soccer.RDS")
+nba_tml <- readRDS("sport-perceptions/raw-data/nba_tml.RDS")
+nhl_tml <- readRDS("sport-perceptions/raw-data/nhl_tml.RDS")
+basketball <- readRDS("sport-perceptions/raw-data/basketball.RDS")
 ```
 
 ```{r nfl_tml words}
@@ -119,6 +122,9 @@ ussoccer_tml_clean <- tweetclean(ussoccer_tml)
 hockey_clean <- tweetclean(hockey)
 soccer_clean <- tweetclean(soccer)
 nfl_tml_clean <- tweetclean(nfl_tml)
+nba_tml_clean <- tweetclean(nba_tml)
+nhl_tml_clean <- tweetclean(nhl_tml)
+basketball_clean <- tweetclean(basketball)
 ```
 
 ```{r paired words}
@@ -176,6 +182,9 @@ usahockey_prop <- proportion_words(usahockey_tml_clean)
 ussoccer_prop <- proportion_words(ussoccer_tml_clean)
 hockey_prop <- proportion_words(hockey_clean)
 soccer_prop <- proportion_words(soccer_clean)
+nba_prop <- proportion_words(nba_tml_clean)
+nhl_prop <- proportion_words(nhl_tml_clean)
+basketball_prop <- proportion_words(basketball_clean)
 ```
 
 ```{r bootstrap resample, cache = TRUE, eval = FALSE}
@@ -218,6 +227,18 @@ bootstrap_usahockey <- bootstrap_prop(usahockey_tml)
 bootstrap_ussoccer <- bootstrap_prop(ussoccer_tml)
 bootstrap_soccer <- bootstrap_prop(soccer)
 bootstrap_hockey <- bootstrap_prop(hockey)
+bootstrap_basketball <- bootstrap_prop(basketball)
+bootstrap_nba <- bootstrap_prop(nba_tml)
+bootstrap_nhl <- bootstrap_prop(nhl_tml)
+
+file.create("bootstrap_basketball.RDS")
+saveRDS(bootstrap_basketball, file = "sport-perceptions/raw-data/bootstrap_basketball.RDS")
+
+file.create("bootstrap_nba.RDS")
+saveRDS(bootstrap_nba, file = "sport-perceptions/raw-data/bootstrap_nba.RDS")
+
+file.create("bootstrap_nhl.RDS")
+saveRDS(bootstrap_nhl, file = "sport-perceptions/raw-data/bootstrap_nhl.RDS")
 
 file.create("bootstrap_rugby.RDS")
 saveRDS(bootstrap_rugby, file = "sport-perceptions/raw-data/bootstrap_rugby.RDS")

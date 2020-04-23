@@ -193,6 +193,22 @@ hockey <- search_tweets("hockey", n = 4000, include_rts = FALSE, geocode = usa) 
          reply_count, 
          hashtags)
 
+basketball <- search_tweets("basketball", n = 4000, include_rts = FALSE, geocode = usa) %>%
+   select(user_id, 
+         created_at, 
+         screen_name, 
+         text, 
+         is_quote, 
+         is_retweet, 
+         retweet_count, 
+         favorite_count, 
+         quote_count, 
+         reply_count, 
+         hashtags)
+
+file.create("basketball.RDS")
+saveRDS(basketball, file = "sport-perceptions/raw-data/basketball.RDS")
+
 file.create("hockey.RDS")
 saveRDS(hockey, file = "sport-perceptions/raw-data/hockey.RDS")
 
@@ -210,5 +226,14 @@ usahockey_tml <- get_timeline("usahockey", n = 3200)
 
 file.create("usahockey_tml.RDS")
 saveRDS(usahockey_tml, file = "sport-perceptions/raw-data/usahockey_tml.RDS")
+
+nhl_tml <- get_timeline("NHL", n = 3200)
+
+file.create("nhl_tml.RDS")
+saveRDS(nhl_tml, file = "sport-perceptions/raw-data/nhl_tml.RDS")
+
+nba_tml <- get_timeline("NBA", n = 3200)
+file.create("nba_tml.RDS")
+saveRDS(nba_tml, file = "sport-perceptions/raw-data/nba_tml.RDS")
 ```
 
