@@ -98,7 +98,7 @@ server <- function(input, output) {
        Error bars = 95% confidence interval",
                  x = "Sport",
                  y = "Proportion (in %)") +
-            scale_x_discrete(labels = c("Football", "Hockey", "Rugby", "Soccer"))
+            scale_x_discrete(labels = c("Basketball", "Football", "Hockey", "Rugby", "Soccer"))
     } else if(input$plot1 == "organ"){ggplot(organ, aes(x = organization, y = prop, fill = organization)) + geom_col() +
             geom_errorbar(aes(x = organization, ymin = lower, ymax = upper)) +
             theme_classic() +
@@ -109,7 +109,7 @@ server <- function(input, output) {
        Error bars = 95% confidence interval",
                  x = "Organization",
                  y = "Proportion (in %)") +
-            scale_x_discrete(labels = c("NFL", "Super Rugby", "USA Hockey", "USA Rugby", "US Soccer", "World Rugby"))
+            scale_x_discrete(labels = c("NBA", "NFL", "NHL", "Super Rugby", "USA Hockey", "USA Rugby", "US Soccer", "World Rugby"))
     }
 
 })
