@@ -11,11 +11,14 @@ library(shiny)
 library(tidyverse)
 library(shinythemes)
 library(readr)
+library(dplyr)
+library(ggplot2)
 
 # Create variables for ggplot
 
 sports <- read_rds("raw-data/sports.RDS")
 organ <- read_rds("raw-data/organ.RDS")
+merged <- read_rds("raw-data/organ.RDS")
 
 
 ui <- navbarPage(
@@ -60,7 +63,8 @@ ui <- navbarPage(
                           span(),
                           selectInput("plot1", "Different Comparisons:",
                                       choices = list("Sports" = "sports",
-                                                     "Organizations" = "organ"),
+                                                     "Organizations" = "organ",
+                                                     "Rugby" = "rugby"),
                                       selected = "Sports")),
                       mainPanel(plotOutput("proportions_plot"))))))
 
@@ -110,6 +114,16 @@ server <- function(input, output) {
                  x = "Organization",
                  y = "Proportion (in %)") +
             scale_x_discrete(labels = c("NBA", "NFL", "NHL", "Super Rugby", "USA Hockey", "USA Rugby", "US Soccer", "World Rugby"))
+    } else if(input$plot1 == "rugby"){merged %>% filter(sport == "rugby") %>%
+            ggplot(aes(x = organization, y = prop, fill = organization)) + geom_col() +
+            theme_classic() +
+            geom_errorbar(aes(x = organization, ymin = lower, ymax = upper)) +
+            labs(title = "Proportion of Tweets From Major Rugby Accounts Containing Words Related to Injury",
+                 subtitle = "Words Searched For: concussion(s), injury(ies), CTE",
+                 caption = "3,200 most recent tweets from a given organization's verified twitter account, scraped on 4/22/20
+       Error bars = 95% confidence interval",
+                 x = "Organization",
+                 y = "Proportion (in %)")
     }
 
 })

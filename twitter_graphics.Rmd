@@ -336,7 +336,7 @@ hockey_prop <- hockey_prop %>%
 soccer_prop <- soccer_prop %>%
   mutate(sport = "soccer")
 nba_prop <- nba_prop %>%
-  mutate(organization = "nba")
+  mutate(organization = "nba") 
 nhl_prop <- nhl_prop %>%
   mutate(organization = "nhl")
 basketball_prop <- basketball_prop %>%
@@ -376,7 +376,15 @@ organ_error <- nfl_error %>%
   full_join(nhl_error, by = c("lower", "upper", "organization"))
 
 organ <- organ_prop %>%
-  full_join(organ_error, by = "organization")
+  full_join(organ_error, by = "organization") %>%
+  mutate(sport = ifelse(organization == "nfl", "football", 
+                        ifelse(organization == "nhl" |
+                                 organization == "usahockey", "hockey", 
+                               ifelse(organization == "ussoccer", "soccer", 
+                                      ifelse(organization == "usarugby" | 
+                                               organization ==  "worldrugby" |
+                                               organization == "superrugby", "rugby", 
+                                             ifelse(organization == "nba", "basketball", NA))))))
 
 file.create("sports.RDS")
 saveRDS(sports, file = "sport-perceptions/raw-data/sports.RDS")
@@ -408,5 +416,20 @@ ggplot(organ, aes(x = organization, y = prop, fill = organization)) + geom_col()
        x = "Organization", 
        y = "Proportion (in %)")
 ```
+```{r}
+
+# Create fully merged tibble, add sports column to everything to join by 
+
+merged <- sports %>%
+  full_join(organ, by = c("contains_word", "n", "total", "prop", "lower", "upper", "sport")) %>%
+  mutate(organization = ifelse(is.na(organization), sport, organization))
+
+file.create("merged.RDS")
+saveRDS(merged, file = "sport-perceptions/raw-data/merged.RDS")
+
+merged %>% filter(sport == "rugby") %>%
+        ggplot(aes(x = organization, y = prop, fill = organization)) + geom_col()
+```
+
 
 
