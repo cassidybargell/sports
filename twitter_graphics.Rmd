@@ -306,6 +306,14 @@ hockey_error <- error(bootstrap_hockey) %>%
   mutate(sport = "hockey")
 soccer_error <- error(bootstrap_soccer) %>%
   mutate(sport = "soccer")
+nba_error <- error(bootstrap_nba) %>%
+  mutate(organization = "nba")
+nhl_error <- error(bootstrap_nhl) %>%
+  mutate(organization = "nhl")
+basketball_error <- error(bootstrap_basketball) %>%
+  mutate(sport = "basketball")
+football_error <- error(bootstrap_football) %>%
+  mutate(sport = "football")
 
 football_prop <- football_prop %>%
   mutate(sport = "football") 
@@ -327,16 +335,24 @@ hockey_prop <- hockey_prop %>%
   mutate(sport = "hockey")
 soccer_prop <- soccer_prop %>%
   mutate(sport = "soccer")
+nba_prop <- nba_prop %>%
+  mutate(organization = "nba")
+nhl_prop <- nhl_prop %>%
+  mutate(organization = "nhl")
+basketball_prop <- basketball_prop %>%
+  mutate(sport = "basketball")
 
 sports_prop <- football_prop %>%
   full_join(rugby_prop, by = c("prop", "n", "total", "contains_word", "sport")) %>%
   full_join(hockey_prop, by = c("prop", "n", "total", "contains_word", "sport")) %>%
-  full_join(soccer_prop, by = c("prop", "n", "total", "contains_word", "sport"))
+  full_join(soccer_prop, by = c("prop", "n", "total", "contains_word", "sport")) %>%
+  full_join(basketball_prop, by = c("prop", "n", "total", "contains_word", "sport"))
 
 sports_error <- football_error %>%
   full_join(rugby_error, by = c("lower", "upper", "sport")) %>%
   full_join(soccer_error, by = c("lower", "upper", "sport")) %>%
-  full_join(hockey_error, by = c("lower", "upper", "sport"))
+  full_join(hockey_error, by = c("lower", "upper", "sport")) %>%
+  full_join(basketball_error, by = c("lower", "upper", "sport"))
 
 sports <- sports_prop %>%
   full_join(sports_error, by = "sport")
@@ -346,14 +362,18 @@ organ_prop <- nfl_prop %>%
   full_join(ussoccer_prop, by = c("prop", "n", "total", "contains_word", "organization")) %>%
   full_join(usahockey_prop, by = c("prop", "n", "total", "contains_word", "organization")) %>%
   full_join(wr_prop, by = c("prop", "n", "total", "contains_word", "organization")) %>%
-  full_join(sr_prop, by = c("prop", "n", "total", "contains_word", "organization"))
+  full_join(sr_prop, by = c("prop", "n", "total", "contains_word", "organization")) %>%
+  full_join(nba_prop, by = c("prop", "n", "total", "contains_word", "organization")) %>%
+  full_join(nhl_prop, by = c("prop", "n", "total", "contains_word", "organization"))
 
 organ_error <- nfl_error %>%
   full_join(usarugby_error, by = c("lower", "upper", "organization")) %>%
   full_join(ussoccer_error, by = c("lower", "upper", "organization")) %>%
   full_join(usahockey_error, by = c("lower", "upper", "organization")) %>%
   full_join(wr_error, by = c("lower", "upper", "organization")) %>%
-  full_join(sr_error, by = c("lower", "upper", "organization"))
+  full_join(sr_error, by = c("lower", "upper", "organization")) %>%
+  full_join(nba_error, by = c("lower", "upper", "organization")) %>%
+  full_join(nhl_error, by = c("lower", "upper", "organization"))
 
 organ <- organ_prop %>%
   full_join(organ_error, by = "organization")
