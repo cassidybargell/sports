@@ -477,11 +477,6 @@ saveRDS(merged, file = "sport-perceptions/raw-data/merged.RDS")
 
 merged %>% filter(sport == "rugby") %>%
         ggplot(aes(x = organization, y = prop, fill = organization)) + geom_col()
-
-organ <- readRDS("sport-perceptions/raw-data/organ.RDS")
-
-organ %>% 
-  mutate(newprop = prop * 28)
 ```
 
 ```{r}
