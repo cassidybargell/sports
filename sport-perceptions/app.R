@@ -13,12 +13,14 @@ library(shinythemes)
 library(readr)
 library(dplyr)
 library(ggplot2)
+library(maps)
 
 # Create variables for ggplot
 
 sports <- read_rds("raw-data/sports.RDS")
 organ <- read_rds("raw-data/organ.RDS")
 merged <- read_rds("raw-data/organ.RDS")
+rugby_map <- read_rds("raw-data/rugby_map.RDS")
 
 
 ui <- navbarPage(
@@ -84,9 +86,27 @@ ui <- navbarPage(
                           selectInput("plot1", "Different Comparisons:",
                                       choices = list("Sports" = "sports",
                                                      "Organizations" = "organ",
-                                                     "Rugby" = "rugby"),
+                                                     "Rugby" = "rugby",
+                                                     "Football" = "football"),
                                       selected = "Sports")),
                       mainPanel(plotOutput("proportions_plot"))))),
+
+
+    #### MAPS
+
+    tabPanel("Maps",
+             tabsetPanel(
+                 tabPanel("Map",
+                          h3("Map"),
+                          sidebarPanel(
+                              helpText("Select to compare between:"),
+                              span(),
+                              selectInput("plot2", "Different Comparisons:",
+                                          choices = list("Rugby" = "rugby_map",
+                                                         "Football" = "football_map",
+                                                         "Rugby" = "rugby"),
+                                          selected = "Rugby")),
+                          mainPanel(plotOutput("map_plot"))))),
 
 
     #### FOOTNOTES
@@ -158,9 +178,10 @@ server <- function(input, output) {
                  subtitle = "Words Searched For: concussion(s), injury(ies), CTE",
                  caption = "3,200 most recent tweets from a given organization's verified twitter account, scraped on 4/22/20
        Error bars = 95% confidence interval",
-                 x = "Organization",
+                 x = "Twitter Verified Accounts",
                  y = "Proportion (in %)") +
-            scale_x_discrete(labels = c("NBA", "NFL", "NHL", "Super Rugby", "USA Hockey", "USA Rugby", "US Soccer", "World Rugby"))
+            scale_x_discrete(labels = c("NBA", "NCAA", "NCAA Football", "NFL", "NHL", "NCAA Research", "Super Rugby", "USA Hockey", "USA Rugby", "US Soccer", "World Rugby")) +
+            theme(axis.text.x = element_text(angle = 45, hjust = 1))
     } else if(input$plot1 == "rugby"){merged %>% filter(sport == "rugby") %>%
             ggplot(aes(x = organization, y = prop, fill = organization)) + geom_col() +
             theme_classic() +
@@ -170,7 +191,19 @@ server <- function(input, output) {
                  caption = "3,200 most recent tweets from a given organization's verified twitter account, scraped on 4/22/20
        Error bars = 95% confidence interval",
                  x = "Organization",
-                 y = "Proportion (in %)")
+                 y = "Proportion (in %)",
+                 fill = "Organizations")
+    } else if(input$plot1 == "football"){merged %>% filter(sport == "football") %>%
+            ggplot(aes(x = organization, y = prop, fill = organization)) + geom_col() +
+            theme_classic() +
+            geom_errorbar(aes(x = organization, ymin = lower, ymax = upper)) +
+            labs(title = "Proportion of Tweets Relating to Football Containing Words Related to Injury",
+                 subtitle = "Words Searched For: concussion(s), injury(ies), CTE",
+                 caption = "3,200 most recent tweets from a given organization's verified twitter account, scraped on 4/22/20
+       Error bars = 95% confidence interval",
+                 x = "Organization",
+                 y = "Proportion (in %)",
+                 fill = "Organizations")
     }
 
 })

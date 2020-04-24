@@ -1,0 +1,69 @@
+---
+title: "maps"
+author: "Cassidy Bargell"
+date: "4/22/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(rtweet)
+library(httpuv)
+library(gtrendsR)
+library(lubridate)
+library(maps)
+library(pals)
+library(viridis)
+library(scico)
+library(ggrepel)
+library(tidytext)
+data("stop_words")
+```
+
+```{r twitter setup}
+
+# Twitter set-up stuff
+
+app_name <- "clb_twitter_app"
+api_key <- "qFVEvxpEi0OmgWSmuIgG7RMPx"
+api_secret_key <- "4KAvZL1OFZIITkrxY7xou9dAsTurvlvrXcd5edKX7NoVJ1sGyf"
+token <- create_token(
+  app = "clb_twitter_app",
+  consumer_key = api_key,
+  consumer_secret = api_secret_key)
+
+path_to_token <- file.path(path.expand("~"), ".twitter_token.rds")
+saveRDS(token, path_to_token)
+env_var <- paste0("TWITTER_PAT=", path_to_token)
+cat(env_var, file = file.path(path.expand("~"), ".Renviron"), 
+  fill = TRUE, append = TRUE)
+
+readRenviron("~/.Renviron")
+
+usa <- lookup_coords(address = "usa", apikey = "88a679312c139a94aa3d3210ef78e8a8e1a925f6")
+```
+
+```{r}
+rugby <- search_tweets("rugby", n = 4000, include_rts = FALSE, geocode = usa)
+
+rugby_map <- lat_lng(rugby)
+
+file.create("rugby_map.RDS")
+saveRDS(rugby_map, file = "sport-perceptions/raw-data/rugby_map.RDS")
+
+## plot state boundaries
+
+
+par(mar = c(0, 0, 0, 0))
+maps::map("state", lwd = .25)
+
+## plot lat and lng points onto state map
+with(rugby_map, points(lng, lat, pch = 20, cex = .75, col = rgb(0, .3, .7, .75)))
+
+
+ggsave(filename = "rugby_map.jpeg", path = "sport-perceptions/raw-data/rugby_map.jpeg")
+
+
+```
+

@@ -43,6 +43,9 @@ soccer <- readRDS("sport-perceptions/raw-data/soccer.RDS")
 nba_tml <- readRDS("sport-perceptions/raw-data/nba_tml.RDS")
 nhl_tml <- readRDS("sport-perceptions/raw-data/nhl_tml.RDS")
 basketball <- readRDS("sport-perceptions/raw-data/basketball.RDS")
+ncaa_foot_tml <- readRDS("sport-perceptions/raw-data/ncaa_foot_tml.RDS")
+ncaa_tml <- readRDS("sport-perceptions/raw-data/ncaa_tml.RDS")
+ncaa_research <- readRDS("sport-perceptions/raw-data/research_tml.RDS")
 ```
 
 ```{r nfl_tml words}
@@ -126,6 +129,9 @@ nfl_tml_clean <- tweetclean(nfl_tml)
 nba_tml_clean <- tweetclean(nba_tml)
 nhl_tml_clean <- tweetclean(nhl_tml)
 basketball_clean <- tweetclean(basketball)
+ncaafoot_clean <- tweetclean(ncaa_foot_tml)
+ncaa_clean <- tweetclean(ncaa_tml)
+research_clean <- tweetclean(research_tml)
 ```
 
 ```{r paired words}
@@ -186,6 +192,9 @@ soccer_prop <- proportion_words(soccer_clean)
 nba_prop <- proportion_words(nba_tml_clean)
 nhl_prop <- proportion_words(nhl_tml_clean)
 basketball_prop <- proportion_words(basketball_clean)
+ncaafoot_prop <- proportion_words(ncaafoot_clean)
+ncaa_prop <- proportion_words(ncaa_clean)
+research_prop <- proportion_words(research_clean)
 ```
 
 ```{r bootstrap resample, cache = TRUE, eval = FALSE}
@@ -267,6 +276,19 @@ saveRDS(bootstrap_soccer, file = "sport-perceptions/raw-data/bootstrap_soccer.RD
 
 file.create("bootstrap_hockey.RDS")
 saveRDS(bootstrap_hockey, file = "sport-perceptions/raw-data/bootstrap_hockey.RDS")
+
+bootstrap_ncaafoot <- bootstrap_prop(ncaa_foot_tml)
+bootstrap_ncaa <- bootstrap_prop(ncaa_tml)
+bootstrap_research <- bootstrap_prop(research_tml)
+
+file.create("bootstrap_ncaafoot.RDS")
+saveRDS(bootstrap_ncaafoot, file = "sport-perceptions/raw-data/bootstrap_ncaafoot.RDS")
+
+file.create("bootstrap_ncaa.RDS")
+saveRDS(bootstrap_ncaa, file = "sport-perceptions/raw-data/bootstrap_ncaa.RDS")
+
+file.create("bootstrap_research.RDS")
+saveRDS(bootstrap_research, file = "sport-perceptions/raw-data/bootstrap_research.RDS")
 ```
 
 
@@ -315,6 +337,12 @@ basketball_error <- error(bootstrap_basketball) %>%
   mutate(sport = "basketball")
 football_error <- error(bootstrap_football) %>%
   mutate(sport = "football")
+ncaafoot_error <- error(bootstrap_ncaafoot) %>%
+  mutate(organization = "ncaafoot")
+ncaa_error <- error(bootstrap_ncaa) %>%
+  mutate(organization = "ncaa")
+research_error <- error(bootstrap_research) %>%
+  mutate(organization = "research")
 
 football_prop <- football_prop %>%
   mutate(sport = "football") 
@@ -342,6 +370,12 @@ nhl_prop <- nhl_prop %>%
   mutate(organization = "nhl")
 basketball_prop <- basketball_prop %>%
   mutate(sport = "basketball")
+ncaafoot_prop <- ncaafoot_prop %>%
+  mutate(organization = "ncaafoot")
+ncaa_prop <- ncaa_prop %>%
+  mutate(organization = "ncaa")
+research_prop <- research_prop %>%
+  mutate(organization = "research")
 
 sports_prop <- football_prop %>%
   full_join(rugby_prop, by = c("prop", "n", "total", "contains_word", "sport")) %>%
@@ -365,7 +399,10 @@ organ_prop <- nfl_prop %>%
   full_join(wr_prop, by = c("prop", "n", "total", "contains_word", "organization")) %>%
   full_join(sr_prop, by = c("prop", "n", "total", "contains_word", "organization")) %>%
   full_join(nba_prop, by = c("prop", "n", "total", "contains_word", "organization")) %>%
-  full_join(nhl_prop, by = c("prop", "n", "total", "contains_word", "organization"))
+  full_join(nhl_prop, by = c("prop", "n", "total", "contains_word", "organization")) %>%
+  full_join(ncaafoot_prop, by = c("prop", "n", "total", "contains_word", "organization")) %>%
+  full_join(ncaa_prop, by = c("prop", "n", "total", "contains_word", "organization")) %>%
+  full_join(research_prop, by = c("prop", "n", "total", "contains_word", "organization")) 
 
 organ_error <- nfl_error %>%
   full_join(usarugby_error, by = c("lower", "upper", "organization")) %>%
@@ -374,18 +411,24 @@ organ_error <- nfl_error %>%
   full_join(wr_error, by = c("lower", "upper", "organization")) %>%
   full_join(sr_error, by = c("lower", "upper", "organization")) %>%
   full_join(nba_error, by = c("lower", "upper", "organization")) %>%
-  full_join(nhl_error, by = c("lower", "upper", "organization"))
+  full_join(nhl_error, by = c("lower", "upper", "organization")) %>%
+  full_join(ncaafoot_error, by = c("lower", "upper", "organization")) %>%
+  full_join(ncaa_error, by = c("lower", "upper", "organization")) %>%
+  full_join(research_error, by = c("lower", "upper", "organization")) 
 
 organ <- organ_prop %>%
   full_join(organ_error, by = "organization") %>%
-  mutate(sport = ifelse(organization == "nfl", "football", 
+  mutate(sport = ifelse(organization == "nfl" |
+                          organization == "ncaafoot", "football", 
                         ifelse(organization == "nhl" |
                                  organization == "usahockey", "hockey", 
                                ifelse(organization == "ussoccer", "soccer", 
                                       ifelse(organization == "usarugby" | 
                                                organization ==  "worldrugby" |
                                                organization == "superrugby", "rugby", 
-                                             ifelse(organization == "nba", "basketball", NA))))))
+                                             ifelse(organization == "nba", "basketball", 
+                                                    ifelse(organization == "ncaa" |
+                                                             organization == "research", "all", NA)))))))
 
 file.create("sports.RDS")
 saveRDS(sports, file = "sport-perceptions/raw-data/sports.RDS")
