@@ -121,16 +121,23 @@ research_clean <- tweetclean(ncaa_research)
 # make process cleaner.
 
 proportion_words <- function(tib){
-  
 tib$stripped_text <- gsub("http.*","",  tib$text)
 tib$stripped_text <- gsub("https.*","", tib$stripped_text)
-
   tib %>%
-  mutate(has = ifelse(str_detect(stripped_text, regex("injury", ignore_case = TRUE)), 1, 0)) %>%
-  mutate(has = ifelse(str_detect(stripped_text, regex("injuries", ignore_case = TRUE)), 1, 0)) %>%
-  mutate(has = ifelse(str_detect(stripped_text, regex("concussion", ignore_case = TRUE)), 1, 0)) %>%
-  mutate(has = ifelse(str_detect(stripped_text, regex("concussions", ignore_case = TRUE)), 1, 0)) %>%
-  mutate(has = ifelse(str_detect(stripped_text, regex("cte", ignore_case = TRUE)), 1, 0)) %>%
+mutate(has_injury = ifelse(str_detect(stripped_text, 
+                                        regex("injury", ignore_case = TRUE)), 1, 0)) %>%
+  mutate(has_injuries = ifelse(str_detect(stripped_text, 
+                                          regex("injuries", ignore_case = TRUE)), 1, 0)) %>%
+  mutate(has_concussion = ifelse(str_detect(stripped_text, 
+                                            regex("concussion", ignore_case = TRUE)), 1, 0)) %>%
+  mutate(has_concussions = ifelse(str_detect(stripped_text,
+                                             regex("concussions", ignore_case = TRUE)), 1, 0)) %>%
+  mutate(has_cte = ifelse(str_detect(stripped_text, 
+                                     regex("CTE")), 1, 0)) %>%
+  select(screen_name, stripped_text, 
+         has_injuries, has_injury, has_concussion, has_concussions, has_cte) %>%
+  mutate(has = ifelse(has_injuries == 1 | has_injury == 1 | has_concussion == 1 | 
+           has_concussions == 1 | has_cte == 1, 1, 0)) %>%
   count(has) %>%
   mutate(total = sum(n)) %>%
   filter(has == 1) %>%
@@ -432,7 +439,8 @@ merged %>% filter(sport == "football") %>%
 
 ```{r}
 # Want to be able to display all the tweets that contain one of the key words I
-# am searching for on my shiny app.
+# am searching for on my shiny app. Have to let CTE only be detected if in all
+# caps, otherwise it will detect a bunch of random words with cte in the middle.
 
 library(stringr)
 library(dplyr)
@@ -442,15 +450,15 @@ football$stripped_text <- gsub("https.*","", football$stripped_text)
 
 foot_cw <- football %>%
   mutate(has_injury = ifelse(str_detect(stripped_text, 
-                                        regex("injury", ignore_case = TRUE)), 1, 0)) %>%
+                                        regex("injury", ignore_case = TRUE, type = "word")), 1, 0)) %>%
   mutate(has_injuries = ifelse(str_detect(stripped_text, 
-                                          regex("injuries", ignore_case = TRUE)), 1, 0)) %>%
+                                          regex("injuries", ignore_case = TRUE, type = "word")), 1, 0)) %>%
   mutate(has_concussion = ifelse(str_detect(stripped_text, 
-                                            regex("concussion", ignore_case = TRUE)), 1, 0)) %>%
+                                            regex("concussion", ignore_case = TRUE, type = "word")), 1, 0)) %>%
   mutate(has_concussions = ifelse(str_detect(stripped_text, 
-                                            regex("concussions", ignore_case = TRUE)), 1, 0)) %>%
+                                            regex("concussions", ignore_case = TRUE, type = "word")), 1, 0)) %>%
   mutate(has_cte = ifelse(str_detect(stripped_text, 
-                                            regex("cte", ignore_case = TRUE)), 1, 0)) %>%
+                                            regex("CTE", type = "word")), 1, 0)) %>%
   select(screen_name, stripped_text, 
          has_injuries, has_injury, has_concussion, has_concussions, has_cte) %>%
   filter(has_injuries == 1 | has_injury == 1 | has_concussion == 1 | has_concussions == 1 | has_cte == 1)
@@ -470,7 +478,7 @@ tib %>%
   mutate(has_concussions = ifelse(str_detect(stripped_text, 
                                             regex("concussions", ignore_case = TRUE)), 1, 0)) %>%
   mutate(has_cte = ifelse(str_detect(stripped_text, 
-                                            regex("cte", ignore_case = TRUE)), 1, 0)) %>%
+                                            regex("CTE")), 1, 0)) %>%
   select(screen_name, stripped_text, 
          has_injuries, has_injury, has_concussion, has_concussions, has_cte) %>%
   filter(has_injuries == 1 | has_injury == 1 | has_concussion == 1 | 
