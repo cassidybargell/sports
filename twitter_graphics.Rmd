@@ -161,13 +161,17 @@ football_words_counts <- football_filtered %>%
 
 ```{r}
 
-# Try to find proportions of cleaned tweets, can then bootstrap resample. 
+# Try to find proportions of cleaned tweets, can then bootstrap re-sample.
+# Because the words are taken out of their tweets to key word search, 6 as the
+# average tweet length (~ 30 characters per tweet, average word legnth of 5
+# characters in English) to put in terms of proportion of tweets rather than
+# just proportion of total words.
 
 football_prop <- football_clean %>%
   count(contains_word = (word == "concussion" | word == "concussions" | word == "cte" | word == "injury" |  word == "injuries")) %>%
   mutate(total = sum(n)) %>%
   filter(contains_word == 'TRUE') %>%
-  mutate(prop = (n / total) * 100)
+  mutate(prop = ((n / total) * 6) * 100)
 
 # Make function to make that process easier. The final proportion is in
 # percentage.
@@ -177,7 +181,7 @@ proportion_words <- function(tib){
   count(contains_word = (word == "concussion" | word == "concussions" | word == "cte" | word == "injury" |  word == "injuries")) %>%
   mutate(total = sum(n)) %>%
   filter(contains_word == 'TRUE') %>%
-  mutate(prop = (n / total) * 100)
+  mutate(prop = ((n / total) * 6) * 100)
 }
 
 rugby_prop <- proportion_words(rugby_clean)
@@ -473,6 +477,11 @@ saveRDS(merged, file = "sport-perceptions/raw-data/merged.RDS")
 
 merged %>% filter(sport == "rugby") %>%
         ggplot(aes(x = organization, y = prop, fill = organization)) + geom_col()
+
+organ <- readRDS("sport-perceptions/raw-data/organ.RDS")
+
+organ %>% 
+  mutate(newprop = prop * 28)
 ```
 
 ```{r}
