@@ -18,6 +18,7 @@ library(viridis)
 library(scico)
 library(ggrepel)
 library(infer)
+library(purrr)
 library(tidyr)
 library(stringr)
 library(tidytext)
@@ -429,6 +430,25 @@ saveRDS(merged, file = "sport-perceptions/raw-data/merged.RDS")
 
 merged %>% filter(sport == "rugby") %>%
         ggplot(aes(x = organization, y = prop, fill = organization)) + geom_col()
+```
+
+```{r}
+# Want to be able to display all the tweets that I am using in my data on my
+# shiny app
+
+library(stringr)
+library(dplyr)
+
+football %>%
+  select(screen_name, retweet_count, favorite_count, stripped_text) %>%
+  mutate(contain = purrr::map_dfc(football, ~ str_detect(football$stripped_text, "injury")))
+
+purrr::map_lgl(football, ~grepl(football$stripped_text, "injury"))
+   
+football %>%
+  select(screen_name, retweet_count, favorite_count, stripped_text) %>%
+  mutate(contain = purrr::map_lgl(football, ~grepl(football$text, "injury")))
+ 
 ```
 
 

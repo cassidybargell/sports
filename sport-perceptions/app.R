@@ -29,6 +29,9 @@ ui <- navbarPage(
 
     tabPanel("About",
 
+             imageOutput("twitter_picture", width = "100%", height = "100%"),
+             br(),
+
              # title and subtitle
 
              h2("How are different sports percieved in terms of injuries?", align = "center"),
@@ -45,7 +48,24 @@ ui <- navbarPage(
 
                                         #text to introduce project
 
-                                        p("The aim of my project is to ... "),
+                                        p("The aim of this project is to look at how different sports and injuries are
+                                          represented and discussed together. Sports injury, and especially head injuries, have
+                                          become increasingly of concern as awareness has grown of potential lifelong effects.
+                                          The NFl has come under intense scrutiny for their handling of concussions and CTE prevelance among players.
+                                          Medical and research data is often inaccessible to the general population, however Twitter is a platform
+                                          where opinions and observations can be made public on any issue of concern. How various sports and injuries
+                                          are discussed together on Twitter gives insight into not only public awareness, but also how different
+                                          organizations choose to address the issue.
+                                          "),
+
+                                        h4(strong("How this Project Works")),
+
+                                        #text to introduce project
+
+                                        p("Data was collected from Twitter, both by random search for tweets containing a key word (reference to a sport),
+                                          as well as by scraping timelines of various governing sports organizations. Of those tweets, a key word search
+                                          for concussion(s), injury(ies), and CTE was used to find the proportion of times those subjects were tweeted
+                                          about together. Bootstrap resampling of the data was used to give a 95% confidence interval of these proportions."),
 
                                         br(),
 
@@ -66,7 +86,7 @@ ui <- navbarPage(
                                                      "Organizations" = "organ",
                                                      "Rugby" = "rugby"),
                                       selected = "Sports")),
-                      mainPanel(plotOutput("proportions_plot"))))))
+                      mainPanel(plotOutput("proportions_plot"))))),
 
 
     #### FOOTNOTES
@@ -76,18 +96,45 @@ ui <- navbarPage(
 
     tabPanel("Footnotes",
 
-
-             h4("References"),
+             imageOutput("nfl_concussion", width = "100%", height = "100%"),
              br(),
 
-             p("I got my data from ... "),
-             p("github link ... ")
-    )
+             h3("References"),
+             br(),
+
+             p("I scraped Twitter for my data using the rtweet package developed by Michael Kearney, and the necessary
+               API keys. I also used data from Google search trends using the gtrendsR package developed by Philippe Massicotte and,
+               Dirk Eddelbuettel."),
+
+             br(),
+
+             h3("About Me"),
+
+             p("My name is Cassidy Bargell and I am an undergraduate at Harvard studying Integrative Biology and Government.
+               I am generally interested in issues related to education, and love to play rugby. You can contact me by email
+               at cassidybargell@college.harvard.edu. The code for this project can be found on my github",
+               a(href = "https://github.com/cassidybargell/sports", "here."))))
+
+
+
 
 
 
 
 server <- function(input, output) {
+
+    #### About
+
+    # load twitter picture
+
+    output$twitter_picture <- renderImage({
+
+        list(src = 'raw-data/twitter_picture.jpeg',
+             height = 300,
+             width = 700,
+             style = "display: block; margin-left: auto; margin-right: auto;")},
+        deleteFile = FALSE
+    )
 
     #### DATA
 
@@ -127,6 +174,17 @@ server <- function(input, output) {
     }
 
 })
+
+    #### FOOTNOTES
+
+    output$nfl_concussion <- renderImage({
+
+        list(src = 'raw-data/nfl_concussion.jpg',
+             height = 300,
+             width = 700,
+             style = "display: block; margin-left: auto; margin-right: auto;")},
+        deleteFile = FALSE
+    )
 }
 
 # Run the application
