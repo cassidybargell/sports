@@ -161,7 +161,7 @@ server <- function(input, output) {
 
     output$proportions_plot <- renderPlot({if(input$plot1 == "sports"){
         ggplot(sports, aes(x = sport, y = prop, fill = sport)) + geom_col() +
-            geom_errorbar(aes(x = sport, ymin = lower, ymax = upper)) +
+            geom_errorbar(aes(x = sport, ymin = lower, ymax = upper), width = 0.5, size = 0.5) +
             theme_classic() +
             theme(legend.position = "none") +
             labs(title = "Proportion of Sports Tweets Containing Words Related to Injury",
@@ -172,7 +172,7 @@ server <- function(input, output) {
                  y = "Proportion (in %)") +
             scale_x_discrete(labels = c("Basketball", "Football", "Hockey", "Rugby", "Soccer"))
     } else if(input$plot1 == "organ"){ggplot(organ, aes(x = organization, y = prop, fill = organization)) + geom_col() +
-            geom_errorbar(aes(x = organization, ymin = lower, ymax = upper)) +
+            geom_errorbar(aes(x = organization, ymin = lower, ymax = upper), width = 0.5, size = 0.5) +
             theme_classic() +
             theme(legend.position = "none") +
             labs(title = "Proportion of Sports Tweet Containing Words Related to Injury",
@@ -186,7 +186,7 @@ server <- function(input, output) {
     } else if(input$plot1 == "rugby"){merged %>% filter(sport == "rugby") %>%
             ggplot(aes(x = organization, y = prop, fill = organization)) + geom_col() +
             theme_classic() +
-            geom_errorbar(aes(x = organization, ymin = lower, ymax = upper)) +
+            geom_errorbar(aes(x = organization, ymin = lower, ymax = upper), width = 0.5, size = 0.5) +
             labs(title = "Proportion of Tweets From Major Rugby Accounts Containing Words Related to Injury",
                  subtitle = "Words Searched For: concussion(s), injury(ies), CTE",
                  caption = "3,200 most recent tweets from a given organization's verified twitter account, scraped on 4/22/20
@@ -199,7 +199,7 @@ server <- function(input, output) {
     } else if(input$plot1 == "football"){merged %>% filter(sport == "football") %>%
             ggplot(aes(x = organization, y = prop, fill = organization)) + geom_col() +
             theme_classic() +
-            geom_errorbar(aes(x = organization, ymin = lower, ymax = upper)) +
+            geom_errorbar(aes(x = organization, ymin = lower, ymax = upper), width = 0.5, size = 0.5) +
             labs(title = "Proportion of Tweets Relating to Football Containing Words Related to Injury",
                  subtitle = "Words Searched For: concussion(s), injury(ies), CTE",
                  caption = "3,200 most recent tweets from a given organization's verified twitter account, scraped on 4/22/20
@@ -214,7 +214,7 @@ server <- function(input, output) {
                 filter(! organization == "nfl") %>%
                 ggplot(aes(x = organization, y = prop, fill = organization)) + geom_col() +
                 theme_classic() +
-                geom_errorbar(aes(x = organization, ymin = lower, ymax = upper)) +
+                geom_errorbar(aes(x = organization, ymin = lower, ymax = upper), width = 0.5, size = 0.5) +
                 labs(title = "Proportion of NCAA Account Tweets Containing Words Related to Injury",
                      subtitle = "Words Searched For: concussion(s), injury(ies), CTE",
                      caption = "3,200 most recent tweets from a given organization's verified twitter account, scraped on 4/23/20
