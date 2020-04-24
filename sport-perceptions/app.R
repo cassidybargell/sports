@@ -194,6 +194,7 @@ server <- function(input, output) {
                  x = "Verified Twitter Accounts",
                  y = "Proportion (in %)",
                  fill = "Organizations") +
+            theme(legend.position = "none") +
             scale_x_discrete(labels = c("Super Rugby", "USA Rugby", "World Rugby"))
     } else if(input$plot1 == "football"){merged %>% filter(sport == "football") %>%
             ggplot(aes(x = organization, y = prop, fill = organization)) + geom_col() +
@@ -206,6 +207,7 @@ server <- function(input, output) {
                  x = "Verified Twitter Accounts",
                  y = "Proportion (in %)",
                  fill = "Organizations") +
+            theme(legend.position = "none") +
             scale_x_discrete(labels = c("NCAA Football", "NFL"))
     }
         else if(input$plot1 == "ncaa"){merged %>% filter(sport == "all" | sport == "football") %>%
@@ -220,6 +222,7 @@ server <- function(input, output) {
                      x = "Verified Twitter Accounts",
                      y = "Proportion (in %)",
                      fill = "Organizations") +
+                theme(legend.position = "none") +
                 scale_x_discrete(labels = c("NCAA", "NCAA Football", "NCAA Research"))
         }
 })
