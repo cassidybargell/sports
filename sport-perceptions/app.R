@@ -13,15 +13,16 @@ library(shinythemes)
 library(readr)
 library(dplyr)
 library(ggplot2)
+library(DT)
 library(maps)
 
-# Create variables for ggplot
+# Create variables for ggplots and data tables
 
 sports <- read_rds("raw-data/sports.RDS")
 organ <- read_rds("raw-data/organ.RDS")
 merged <- read_rds("raw-data/organ.RDS")
 rugby_map <- read_rds("raw-data/rugby_map.RDS")
-
+tweets <- read_rds("raw-data/tweets.RDS")
 
 ui <- navbarPage(
     "Perceptions of Sports and Injuries",
@@ -108,6 +109,25 @@ ui <- navbarPage(
                                                          "Rugby" = "rugby"),
                                           selected = "Rugby")),
                           mainPanel(plotOutput("map_plot"))))),
+
+
+    #### TWEETS
+
+    tabPanel("Explore Tweets",
+
+             fluidPage(
+                 titlePanel("Explore the Tweets"),
+
+                 sidebarLayout(
+                     sidebarPanel(
+                         helpText("Pick a Sport or Account to explore their tweets related to concussions and injuries"),
+                         h3("Tweet Search"),
+                         selectInput("choice", NULL,
+                                     choices = list("@NCAA" = "ncaa"
+                                                    ),
+                                     selected = "ncaa")),
+                     mainPanel(
+                         DTOutput("tweet_table"))))),
 
 
     #### FOOTNOTES
@@ -226,6 +246,25 @@ server <- function(input, output) {
                 scale_x_discrete(labels = c("NCAA", "NCAA Football", "NCAA Research"))
         }
 })
+
+    #### TWEETS
+
+    output$tweet_table <- renderDT({
+
+        tweet_table <- tweets %>%
+
+            #input filters by choice
+
+            filter(choice == input$choice) %>%
+            select(-choice)
+
+        datatable(tweets,
+                  class = 'display',
+                  rownames = FALSE,
+                  selection = 'single',
+                  colnames = c("Screen Name", "Text"),
+                  options = list(dom = 'tip'))
+    })
 
     #### FOOTNOTES
 

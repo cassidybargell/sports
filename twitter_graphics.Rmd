@@ -112,7 +112,7 @@ nhl_tml_clean <- tweetclean(nhl_tml)
 basketball_clean <- tweetclean(basketball)
 ncaafoot_clean <- tweetclean(ncaa_foot_tml)
 ncaa_clean <- tweetclean(ncaa_tml)
-research_clean <- tweetclean(research_tml)
+research_clean <- tweetclean(ncaa_research)
 ```
 
 ```{r}
@@ -121,12 +121,16 @@ research_clean <- tweetclean(research_tml)
 # make process cleaner.
 
 proportion_words <- function(tib){
+  
+tib$stripped_text <- gsub("http.*","",  tib$text)
+tib$stripped_text <- gsub("https.*","", tib$stripped_text)
+
   tib %>%
-  mutate(has = ifelse(str_detect(text, regex("injury", ignore_case = TRUE)), 1, 0)) %>%
-  mutate(has = ifelse(str_detect(text, regex("injuries", ignore_case = TRUE)), 1, 0)) %>%
-  mutate(has = ifelse(str_detect(text, regex("concussion", ignore_case = TRUE)), 1, 0)) %>%
-  mutate(has = ifelse(str_detect(text, regex("concussions", ignore_case = TRUE)), 1, 0)) %>%
-  mutate(has = ifelse(str_detect(text, regex("cte", ignore_case = TRUE)), 1, 0)) %>%
+  mutate(has = ifelse(str_detect(stripped_text, regex("injury", ignore_case = TRUE)), 1, 0)) %>%
+  mutate(has = ifelse(str_detect(stripped_text, regex("injuries", ignore_case = TRUE)), 1, 0)) %>%
+  mutate(has = ifelse(str_detect(stripped_text, regex("concussion", ignore_case = TRUE)), 1, 0)) %>%
+  mutate(has = ifelse(str_detect(stripped_text, regex("concussions", ignore_case = TRUE)), 1, 0)) %>%
+  mutate(has = ifelse(str_detect(stripped_text, regex("cte", ignore_case = TRUE)), 1, 0)) %>%
   count(has) %>%
   mutate(total = sum(n)) %>%
   filter(has == 1) %>%
@@ -148,10 +152,10 @@ nhl_prop <- proportion_words(nhl_tml)
 basketball_prop <- proportion_words(basketball)
 ncaafoot_prop <- proportion_words(ncaa_foot_tml)
 ncaa_prop <- proportion_words(ncaa_tml)
-research_prop <- proportion_words(research_tml)
+research_prop <- proportion_words(ncaa_research)
 ```
 
-```{r bootstrap resample, cache = TRUE, eval = FALSE}
+```{r bootstrap resample}
 
 # Bootstrap re-sample the football data
 
@@ -194,7 +198,7 @@ bootstrap_nba <- bootstrap_prop(nba_tml)
 bootstrap_nhl <- bootstrap_prop(nhl_tml)
 bootstrap_ncaafoot <- bootstrap_prop(ncaa_foot_tml)
 bootstrap_ncaa <- bootstrap_prop(ncaa_tml)
-bootstrap_research <- bootstrap_prop(research_tml)
+bootstrap_research <- bootstrap_prop(ncaa_research)
 
 file.create("bootstrap_basketball.RDS")
 saveRDS(bootstrap_basketball, file = "sport-perceptions/raw-data/bootstrap_basketball.RDS")
@@ -433,41 +437,48 @@ merged %>% filter(sport == "football") %>%
 library(stringr)
 library(dplyr)
 
+football$stripped_text <- gsub("http.*","",  football$text)
+football$stripped_text <- gsub("https.*","", football$stripped_text)
+
 foot_cw <- football %>%
-  mutate(has_injury = ifelse(str_detect(text, 
+  mutate(has_injury = ifelse(str_detect(stripped_text, 
                                         regex("injury", ignore_case = TRUE)), 1, 0)) %>%
-  mutate(has_injuries = ifelse(str_detect(text, 
+  mutate(has_injuries = ifelse(str_detect(stripped_text, 
                                           regex("injuries", ignore_case = TRUE)), 1, 0)) %>%
-  mutate(has_concussion = ifelse(str_detect(text, 
+  mutate(has_concussion = ifelse(str_detect(stripped_text, 
                                             regex("concussion", ignore_case = TRUE)), 1, 0)) %>%
-  mutate(has_concussions = ifelse(str_detect(text, 
+  mutate(has_concussions = ifelse(str_detect(stripped_text, 
                                             regex("concussions", ignore_case = TRUE)), 1, 0)) %>%
-  mutate(has_cte = ifelse(str_detect(text, 
+  mutate(has_cte = ifelse(str_detect(stripped_text, 
                                             regex("cte", ignore_case = TRUE)), 1, 0)) %>%
-  select(screen_name, text, 
+  select(screen_name, stripped_text, 
          has_injuries, has_injury, has_concussion, has_concussions, has_cte) %>%
   filter(has_injuries == 1 | has_injury == 1 | has_concussion == 1 | has_concussions == 1 | has_cte == 1)
            
 contains_word <- function(tib, sp){
-  tib %>%
-  mutate(has_injury = ifelse(str_detect(text, 
+  
+tib$stripped_text <- gsub("http.*","",  tib$text)
+tib$stripped_text <- gsub("https.*","", tib$stripped_text)
+  
+tib %>%
+  mutate(has_injury = ifelse(str_detect(stripped_text, 
                                         regex("injury", ignore_case = TRUE)), 1, 0)) %>%
-  mutate(has_injuries = ifelse(str_detect(text, 
+  mutate(has_injuries = ifelse(str_detect(stripped_text, 
                                           regex("injuries", ignore_case = TRUE)), 1, 0)) %>%
-  mutate(has_concussion = ifelse(str_detect(text, 
+  mutate(has_concussion = ifelse(str_detect(stripped_text, 
                                             regex("concussion", ignore_case = TRUE)), 1, 0)) %>%
-  mutate(has_concussions = ifelse(str_detect(text, 
+  mutate(has_concussions = ifelse(str_detect(stripped_text, 
                                             regex("concussions", ignore_case = TRUE)), 1, 0)) %>%
-  mutate(has_cte = ifelse(str_detect(text, 
+  mutate(has_cte = ifelse(str_detect(stripped_text, 
                                             regex("cte", ignore_case = TRUE)), 1, 0)) %>%
-  select(screen_name, text, 
+  select(screen_name, stripped_text, 
          has_injuries, has_injury, has_concussion, has_concussions, has_cte) %>%
   filter(has_injuries == 1 | has_injury == 1 | has_concussion == 1 | 
            has_concussions == 1 | has_cte == 1) %>%
-    select(screen_name, text) %>%
+    select(screen_name, stripped_text) %>%
     mutate(choice = sp)
 }
- 
+
 rugby_cw <- contains_word(rugby, "rugby")
 football_cw <- contains_word(football, "football")
 hockey_cw <- contains_word(hockey, "hockey")
@@ -477,7 +488,7 @@ nfl_cw <- contains_word(nfl_tml, "nfl")
 nhl_cw <- contains_word(nhl_tml, "nhl")
 nba_cw <- contains_word(nba_tml, "nba")
 ncaa_cw <- contains_word(ncaa_tml, "ncaa")
-research_cw <- contains_word(research_tml, "ncaaresearch")
+research_cw <- contains_word(ncaa_research, "ncaaresearch")
 ncaafoot_cw <- contains_word(ncaa_foot_tml, "ncaafoot")
 usarugby_cw <- contains_word(usarugby_tml, "usarugby")
 sr_cw <- contains_word(sr_tml, "sr")
@@ -486,25 +497,24 @@ ussoccer_cw <- contains_word(ussoccer_tml, "ussoccer")
 usahockey_cw <- contains_word(usahockey_tml, "usahockey")
 
 tweets <- football_cw %>%
-  full_join(rugby_cw, by = c("screen_name", "text", "choice")) %>%
-  full_join(hockey_cw, by = c("screen_name", "text", "choice")) %>%
-  full_join(soccer_cw, by = c("screen_name", "text", "choice")) %>%
-  full_join(basketball_cw, by = c("screen_name", "text", "choice")) %>%
-  full_join(nfl_cw, by = c("screen_name", "text", "choice")) %>%
-  full_join(nhl_cw, by = c("screen_name", "text", "choice")) %>%
-  full_join(nba_cw, by = c("screen_name", "text", "choice")) %>%
-  full_join(ncaa_cw, by = c("screen_name", "text", "choice")) %>%
-  full_join(research_cw, by = c("screen_name", "text", "choice")) %>%
-  full_join(ncaafoot_cw, by = c("screen_name", "text", "choice")) %>%
-  full_join(usarugby_cw, by = c("screen_name", "text", "choice")) %>%
-  full_join(sr_cw, by = c("screen_name", "text", "choice")) %>%
-  full_join(wr_cw, by = c("screen_name", "text", "choice")) %>%
-  full_join(ussoccer_cw, by = c("screen_name", "text", "choice")) %>%
-  full_join(usahockey_cw, by = c("screen_name", "text", "choice")) 
+  full_join(rugby_cw, by = c("screen_name", "stripped_text", "choice")) %>%
+  full_join(hockey_cw, by = c("screen_name", "stripped_text", "choice")) %>%
+  full_join(soccer_cw, by = c("screen_name", "stripped_text", "choice")) %>%
+  full_join(basketball_cw, by = c("screen_name", "stripped_text", "choice")) %>%
+  full_join(nfl_cw, by = c("screen_name", "stripped_text", "choice")) %>%
+  full_join(nhl_cw, by = c("screen_name", "stripped_text", "choice")) %>%
+  full_join(nba_cw, by = c("screen_name", "stripped_text", "choice")) %>%
+  full_join(ncaa_cw, by = c("screen_name", "stripped_text", "choice")) %>%
+  full_join(research_cw, by = c("screen_name", "stripped_text", "choice")) %>%
+  full_join(ncaafoot_cw, by = c("screen_name", "stripped_text", "choice")) %>%
+  full_join(usarugby_cw, by = c("screen_name", "stripped_text", "choice")) %>%
+  full_join(sr_cw, by = c("screen_name", "stripped_text", "choice")) %>%
+  full_join(wr_cw, by = c("screen_name", "stripped_text", "choice")) %>%
+  full_join(ussoccer_cw, by = c("screen_name", "stripped_text", "choice")) %>%
+  full_join(usahockey_cw, by = c("screen_name", "stripped_text", "choice")) 
 
 file.create("tweets.RDS")
 saveRDS(tweets, file = "sport-perceptions/raw-data/tweets.RDS")
-
 ```
 
 
