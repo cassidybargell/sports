@@ -87,7 +87,8 @@ ui <- navbarPage(
                                       choices = list("Sports" = "sports",
                                                      "Organizations" = "organ",
                                                      "Rugby" = "rugby",
-                                                     "Football" = "football"),
+                                                     "Football" = "football",
+                                                     "NCAA" = "ncaa"),
                                       selected = "Sports")),
                       mainPanel(plotOutput("proportions_plot"))))),
 
@@ -190,9 +191,10 @@ server <- function(input, output) {
                  subtitle = "Words Searched For: concussion(s), injury(ies), CTE",
                  caption = "3,200 most recent tweets from a given organization's verified twitter account, scraped on 4/22/20
        Error bars = 95% confidence interval",
-                 x = "Organization",
+                 x = "Verified Twitter Accounts",
                  y = "Proportion (in %)",
-                 fill = "Organizations")
+                 fill = "Organizations") +
+            scale_x_discrete(labels = c("Super Rugby", "USA Rugby", "World Rugby"))
     } else if(input$plot1 == "football"){merged %>% filter(sport == "football") %>%
             ggplot(aes(x = organization, y = prop, fill = organization)) + geom_col() +
             theme_classic() +
@@ -201,11 +203,25 @@ server <- function(input, output) {
                  subtitle = "Words Searched For: concussion(s), injury(ies), CTE",
                  caption = "3,200 most recent tweets from a given organization's verified twitter account, scraped on 4/22/20
        Error bars = 95% confidence interval",
-                 x = "Organization",
+                 x = "Verified Twitter Accounts",
                  y = "Proportion (in %)",
-                 fill = "Organizations")
+                 fill = "Organizations") +
+            scale_x_discrete(labels = c("NCAA Football", "NFL"))
     }
-
+        else if(input$plot1 == "ncaa"){merged %>% filter(sport == "all" | sport == "football") %>%
+                filter(! organization == "nfl") %>%
+                ggplot(aes(x = organization, y = prop, fill = organization)) + geom_col() +
+                theme_classic() +
+                geom_errorbar(aes(x = organization, ymin = lower, ymax = upper)) +
+                labs(title = "Proportion of NCAA Account Tweets Containing Words Related to Injury",
+                     subtitle = "Words Searched For: concussion(s), injury(ies), CTE",
+                     caption = "3,200 most recent tweets from a given organization's verified twitter account, scraped on 4/23/20
+       Error bars = 95% confidence interval",
+                     x = "Verified Twitter Accounts",
+                     y = "Proportion (in %)",
+                     fill = "Organizations") +
+                scale_x_discrete(labels = c("NCAA", "NCAA Football", "NCAA Research"))
+        }
 })
 
     #### FOOTNOTES
