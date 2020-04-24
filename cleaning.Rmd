@@ -235,5 +235,17 @@ saveRDS(nhl_tml, file = "sport-perceptions/raw-data/nhl_tml.RDS")
 nba_tml <- get_timeline("NBA", n = 3200)
 file.create("nba_tml.RDS")
 saveRDS(nba_tml, file = "sport-perceptions/raw-data/nba_tml.RDS")
+
+ncaa_foot_tml <- get_timeline("NCAAFootball", n = 3200)
+file.create("ncaa_foot_tml.RDS")
+saveRDS(ncaa_foot_tml, file = "sport-perceptions/raw-data/ncaa_foot_tml.RDS")
+
+ncaa_tml <- get_timeline("NCAA", n = 3200)
+file.create("ncaa_tml.RDS")
+saveRDS(ncaa_tml, file = "sport-perceptions/raw-data/ncaa_tml.RDS")
+
+research_tml <- get_timeline("NCAAResearch", n = 3200)
+file.create("research_tml.RDS")
+saveRDS(research_tml, file = "sport-perceptions/raw-data/research_tml.RDS")
 ```
 
