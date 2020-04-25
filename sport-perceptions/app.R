@@ -23,6 +23,7 @@ organ <- read_rds("raw-data/organ.RDS")
 merged <- read_rds("raw-data/organ.RDS")
 rugby_map <- read_rds("raw-data/rugby_map.RDS")
 tweets <- read_rds("raw-data/tweets.RDS")
+cleaned_words <- read_rds("raw-data/cleaned_words.RDS")
 
 ui <- navbarPage(
     "Perceptions of Sports and Injuries",
@@ -93,6 +94,22 @@ ui <- navbarPage(
                                       selected = "Sports")),
                       mainPanel(plotOutput("proportions_plot"))))),
 
+    #### WORDS
+
+    tabPanel("Tweet Words",
+             tabsetPanel(
+                 tabPanel("Most Commonly Used Words in Tweets",
+                          sidebarPanel(
+                              helpText("Select to compare between:"),
+                              span(),
+                              selectInput("plot3", "Sports:",
+                                          choices = list("Football" = "football",
+                                                         "Rugby" = "rugby",
+                                                         "Hockey" = "hockey",
+                                                         "Soccer" = "soccer",
+                                                         "Basketball" = "basketball"),
+                                          selected = "football")),
+                          mainPanel(plotOutput("words_plot"))))),
 
     #### MAPS
 
@@ -122,8 +139,23 @@ ui <- navbarPage(
                      sidebarPanel(
                          helpText("Pick a Sport or Account to explore their tweets related to concussions and injuries"),
                          h3("Tweet Search"),
-                         selectInput("choice", NULL,
-                                     choices = list("@NCAA" = "ncaa"
+                         selectInput("x", NULL,
+                                     choices = list("@NCAA" = "ncaa",
+                                                    "@NCAAResearch" = "ncaaresearch",
+                                                    "@NCAAFootball" = "ncaafoot",
+                                                    "@NFL" = "nfl",
+                                                    "@NHL"= "nhl",
+                                                    "@NBA" = "nba",
+                                                    "@USARugby" = "usarugby",
+                                                    "@SuperRugby" = "sr",
+                                                    "@USARugby" = "usarugby",
+                                                    "@USSoccer" = "ussoccer",
+                                                    "@USAHockey" = "usahockey",
+                                                    "Football" = "football",
+                                                    "Rugby" = "rugby",
+                                                    "Hockey" = "hockey",
+                                                    "Soccer" = "soccer",
+                                                    "Basketball" = "basketball"
                                                     ),
                                      selected = "ncaa")),
                      mainPanel(
@@ -251,19 +283,102 @@ server <- function(input, output) {
 
     output$tweet_table <- renderDT({
 
-        tweet_table <- tweets %>%
-
             #input filters by choice
 
-            filter(choice == input$choice) %>%
-            select(-choice)
+        tweet_choice <- tweets %>%
+            filter(choice == input$x) %>%
+            select(! choice)
 
-        datatable(tweets,
+        datatable(tweet_choice,
                   class = 'display',
                   rownames = FALSE,
                   selection = 'single',
                   colnames = c("Screen Name", "Text"),
                   options = list(dom = 'tip'))
+    })
+
+    #### WORDS
+
+    output$words_plot <- renderPlot({if(input$plot3 == "football"){
+        cleaned_words %>%
+            group_by(choice) %>%
+            count(word) %>%
+            arrange(desc(n)) %>%
+            filter(choice == "football") %>%
+            filter(! word == "football", ! word == "amp", ! word == "de") %>%
+            slice(1:15) %>%
+            ggplot(aes(x = word, y = n, fill = word), color = word) + geom_col() +
+            theme(legend.position = "none") +
+            theme_classic() +
+            theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+            labs(title = "Most Commonly Used Words in Football Tweets",
+                 subtitle = "Sport Search Term Filtered Out",
+                 x = "Word",
+                 y  = "Count")
+    } else if(input$plot3 == "rugby"){cleaned_words %>%
+            group_by(choice) %>%
+            count(word) %>%
+            arrange(desc(n)) %>%
+            filter(choice == "rugby") %>%
+            filter(! word == "rugby", ! word == "amp", ! word == "de") %>%
+            slice(1:15) %>%
+            ggplot(aes(x = word, y = n, fill = word), color = word) + geom_col() +
+            theme(legend.position = "none") +
+            theme_classic() +
+            theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+            labs(title = "Most Commonly Used Words in Rugby Tweets",
+                 subtitle = "Sport Search Term Filtered Out",
+                 x = "Word",
+                 y  = "Count")
+    }
+        else if(input$plot3 == "hockey"){cleaned_words %>%
+                group_by(choice) %>%
+                count(word) %>%
+                arrange(desc(n)) %>%
+                filter(choice == "hockey") %>%
+                filter(! word == "hockey", ! word == "amp", ! word == "de") %>%
+                slice(1:15) %>%
+                ggplot(aes(x = word, y = n, fill = word), color = word) + geom_col() +
+                theme(legend.position = "none") +
+                theme_classic() +
+                theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+                labs(title = "Most Commonly Used Words in Hockey Tweets",
+                     subtitle = "Sport Search Term Filtered Out",
+                     x = "Word",
+                     y  = "Count")
+        }
+        else if(input$plot3 == "soccer"){cleaned_words %>%
+                group_by(choice) %>%
+                count(word) %>%
+                arrange(desc(n)) %>%
+                filter(choice == "soccer") %>%
+                filter(! word == "soccer", ! word == "amp", ! word == "de") %>%
+                slice(1:15) %>%
+                ggplot(aes(x = word, y = n, fill = word), color = word) + geom_col() +
+                theme(legend.position = "none") +
+                theme_classic() +
+                theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+                labs(title = "Most Commonly Used Words in Soccer Tweets",
+                     subtitle = "Sport Search Term Filtered Out",
+                     x = "Word",
+                     y  = "Count")
+        }
+        else if(input$plot3 == "basketball"){cleaned_words %>%
+                group_by(choice) %>%
+                count(word) %>%
+                arrange(desc(n)) %>%
+                filter(choice == "basketball") %>%
+                filter(! word == "basketball", ! word == "amp", ! word == "de") %>%
+                slice(1:15) %>%
+                ggplot(aes(x = word, y = n, fill = word), color = word) + geom_col() +
+                theme(legend.position = "none") +
+                theme_classic() +
+                theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+                labs(title = "Most Commonly Used Words in Basketball Tweets",
+                     subtitle = "Sport Search Term Filtered Out",
+                     x = "Word",
+                     y  = "Count")
+        }
     })
 
     #### FOOTNOTES

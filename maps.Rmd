@@ -59,10 +59,12 @@ par(mar = c(0, 0, 0, 0))
 maps::map("state", lwd = .25)
 
 ## plot lat and lng points onto state map
-with(rugby_map, points(lng, lat, pch = 20, cex = .75, col = rgb(0, .3, .7, .75)))
+rugby_p <- plot.new(with(rugby_map, points(lng, lat, pch = 20, cex = .75, col = rgb(0, .3, .7, .75))))
+
+rugby_p + title(main = "attempt")
 
 
-ggsave(filename = "rugby_map.jpeg", path = "sport-perceptions/raw-data/rugby_map.jpeg")
+ggsave(filename = "sport-perceptions/raw-data/rugby_map.png")
 
 
 ```

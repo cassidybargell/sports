@@ -162,7 +162,7 @@ ncaa_prop <- proportion_words(ncaa_tml)
 research_prop <- proportion_words(ncaa_research)
 ```
 
-```{r bootstrap resample}
+```{r bootstrap resample, cache = TRUE, eval = FALSE}
 
 # Bootstrap re-sample the football data
 
@@ -256,7 +256,9 @@ saveRDS(bootstrap_research, file = "sport-perceptions/raw-data/bootstrap_researc
 
 ```{r plots}
 
-# Add column with sport/organization to keep track of rows with joines
+# Add column with sport/organization to keep track of rows with joins. Want to
+# change errors into tibble format to be able to join them and make plotting
+# easier.
 
 football_error <- as_tibble(bootstrap_football) %>%
   mutate(error = c("lower", "upper")) %>%
@@ -525,6 +527,79 @@ file.create("tweets.RDS")
 saveRDS(tweets, file = "sport-perceptions/raw-data/tweets.RDS")
 ```
 
+```{r make word visualizations}
 
+# 
+
+football_clean <- football_clean %>%
+  mutate(choice = "football")
+sr_clean <- sr_clean %>%
+  mutate(choice = "superrugby")
+wr_clean <- wr_clean %>%
+  mutate(choice = "wr")
+rugby_clean <- rugby_clean %>%
+  mutate(choice = "rugby")
+usarugby_clean <- usarugby_tml_clean %>%
+  mutate(choice = "usarugby")
+usahockey_clean <- usahockey_tml_clean %>%
+  mutate(choice = "usahockey")
+ussoccer_clean <- ussoccer_tml_clean %>%
+  mutate(choice = "ussoccer")
+hockey_clean <- hockey_clean %>%
+  mutate(choice = "hockey")
+soccer_clean <- soccer_clean %>%
+  mutate(choice = "soccer")
+nfl_clean <- nfl_tml_clean %>%
+  mutate(choice = "nfl")
+nba_clean <- nba_tml_clean %>%
+  mutate(choice = "nba")
+nhl_clean <- nhl_tml_clean %>%
+  mutate(choice = "nhl")
+basketball_clean <- basketball_clean %>%
+  mutate(choice = "basketball")
+ncaafoot_clean <- ncaafoot_clean %>%
+  mutate(choice = "ncaafootball")
+ncaa_clean <- ncaa_clean %>%
+  mutate(choice = "ncaa")
+research_clean <- research_clean %>%
+  mutate(choice = "research")
+
+cleaned_words <- football_clean %>%
+  full_join(sr_clean, by = c("word", "choice")) %>%
+  full_join(wr_clean, by = c("word", "choice")) %>%
+  full_join(rugby_clean, by = c("word", "choice")) %>%
+  full_join(usarugby_clean, by = c("word", "choice")) %>%
+  full_join(usahockey_clean, by = c("word", "choice")) %>%
+  full_join(ussoccer_clean, by = c("word", "choice")) %>%
+  full_join(hockey_clean, by = c("word", "choice")) %>%
+  full_join(soccer_clean, by = c("word", "choice")) %>%
+  full_join(nfl_clean, by = c("word", "choice")) %>%
+  full_join(nba_clean, by = c("word", "choice")) %>%
+  full_join(nhl_clean, by = c("word", "choice")) %>%
+  full_join(basketball_clean, by = c("word", "choice")) %>%
+  full_join(ncaafoot_clean, by = c("word", "choice")) %>%
+  full_join(ncaa_clean, by = c("word", "choice")) %>%
+  full_join(research_clean, by = c("word", "choice")) 
+
+saveRDS(cleaned_words,file = "sport-perceptions/raw-data/cleaned_words.RDS")
+
+cleaned_words %>%
+  group_by(choice) %>%
+  count(word) %>%
+  arrange(desc(n)) %>%
+  filter(choice == "football") %>%
+  filter(! word == "football") %>%
+  slice(1:15) %>%
+ggplot(aes(x = word, y = n, fill = word), color = word) + geom_col() + 
+  theme(legend.position = "none") + 
+  theme_classic() + 
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  labs(title = "Most Commonly Used Words in Football Tweets",
+       subtitle = "Search Term or Twitter Account Name Filtered Out",
+       x = "Word",
+       y  = "Count") 
+  
+  
+```
 
 
