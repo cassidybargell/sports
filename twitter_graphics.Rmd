@@ -598,8 +598,6 @@ ggplot(aes(x = word, y = n, fill = word), color = word) + geom_col() +
        subtitle = "Search Term or Twitter Account Name Filtered Out",
        x = "Word",
        y  = "Count") 
-  
-  
 ```
 
 

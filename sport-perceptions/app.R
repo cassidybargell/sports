@@ -24,6 +24,8 @@ merged <- read_rds("raw-data/organ.RDS")
 rugby_map <- read_rds("raw-data/rugby_map.RDS")
 tweets <- read_rds("raw-data/tweets.RDS")
 cleaned_words <- read_rds("raw-data/cleaned_words.RDS")
+g_search <- read_rds("raw-data/gtrend_search.RDS")
+g_search2 <- read_rds("raw-data/gtrend_search2.RDS")
 
 ui <- navbarPage(
     "Perceptions of Sports and Injuries",
@@ -54,8 +56,8 @@ ui <- navbarPage(
 
                                         p("The aim of this project is to look at how different sports and injuries are
                                           represented and discussed together. Sports injury, and especially head injuries, have
-                                          become increasingly of concern as awareness has grown of potential lifelong effects.
-                                          The NFl has come under intense scrutiny for their handling of concussions and CTE prevelance among players.
+                                          become increasingly of concern as awareness has grown of the potential for lifelong effects.
+                                          The NFL has come under intense scrutiny for their handling of concussions and CTE prevelance among players.
                                           Medical and research data is often inaccessible to the general population, however Twitter is a platform
                                           where opinions and observations can be made public on any issue of concern. How various sports and injuries
                                           are discussed together on Twitter gives insight into not only public awareness, but also how different
@@ -111,21 +113,39 @@ ui <- navbarPage(
                                           selected = "football")),
                           mainPanel(plotOutput("words_plot"))))),
 
-    #### MAPS
+    #### GOOGLE SEARCH
 
-    tabPanel("Maps",
+    tabPanel("Google Search Hits",
              tabsetPanel(
-                 tabPanel("Map",
-                          h3("Map"),
+                 tabPanel("Google Search Hits",
+                          h3("Google Search Hits Through Time"),
                           sidebarPanel(
-                              helpText("Select to compare between:"),
+                              helpText("Select a Search Term to View"),
                               span(),
-                              selectInput("plot2", "Different Comparisons:",
-                                          choices = list("Rugby" = "rugby_map",
-                                                         "Football" = "football_map",
-                                                         "Rugby" = "rugby"),
-                                          selected = "Rugby")),
-                          mainPanel(plotOutput("map_plot"))))),
+                              selectInput("plot2", "Options:",
+                                          choices = list("Basketball" = "basketball",
+                                                         "Football" = "football",
+                                                         "Rugby" = "rugby",
+                                                         "Soccer" = "soccer",
+                                                         "Hockey" = "hockey",
+                                                         "Concussion" = "concussion",
+                                                         "CTE" = "cte",
+                                                         "TBI" = "tbi"),
+                                          selected = "basketball")),
+                          mainPanel(plotOutput("google_plot"))),
+                 tabPanel("Sport and Concussion",
+                          h3("Google Search Hits Through Time"),
+                          sidebarPanel(
+                              helpText("Select a Search Term to View"),
+                              span(),
+                              selectInput("plot4", "Options:",
+                                          choices = list("Basketball&Concussion" = "'basketball concussion'",
+                                                         "Football&Concussion" = "'football concussion'",
+                                                         "Rugby&Concussion" = "'rugby concussion'",
+                                                         "Soccer&Concussion" = "'soccer concussion'",
+                                                         "Hockey&Concussion" = "'hockey concussion'"),
+                                          selected = "'basketball concussion'")),
+                          mainPanel(plotOutput("google_plot2"))))),
 
 
     #### TWEETS
@@ -196,7 +216,7 @@ ui <- navbarPage(
 
 server <- function(input, output) {
 
-    #### About
+    #### ABOUT
 
     # load twitter picture
 
@@ -380,6 +400,141 @@ server <- function(input, output) {
                      y  = "Count")
         }
     })
+
+    #### GOOGLE SEARCH
+
+    output$google_plot <- renderPlot({if(input$plot2 == "basketball"){
+        g_search %>%
+            filter(keyword == "basketball") %>%
+            ggplot(aes(date, hits, color = keyword)) + geom_path() +
+            labs(title = "Google Search Hits Over Time",
+                 x = "Date",
+                 y = "Hits (Normalized to Scale of 100)",
+                 color = "Search Term") +
+            theme_classic()
+    }
+        else if(input$plot2 == "football"){
+            g_search %>%
+                filter(keyword == "football") %>%
+                ggplot(aes(date, hits, color = keyword)) + geom_path() +
+                labs(title = "Google Search Hits Over Time",
+                     x = "Date",
+                     y = "Hits (Normalized to Scale of 100)",
+                     color = "Search Term") +
+                theme_classic()
+        }
+        else if(input$plot2 == "rugby"){
+            g_search %>%
+                filter(keyword == "rugby") %>%
+                ggplot(aes(date, hits, color = keyword)) + geom_path() +
+                labs(title = "Google Search Hits Over Time",
+                     x = "Date",
+                     y = "Hits (Normalized to Scale of 100)",
+                     color = "Search Term") +
+                theme_classic()
+        }
+        else if(input$plot2 == "soccer"){
+            g_search %>%
+                filter(keyword == "soccer") %>%
+                ggplot(aes(date, hits, color = keyword)) + geom_path() +
+                labs(title = "Google Search Hits Over Time",
+                     x = "Date",
+                     y = "Hits (Normalized to Scale of 100)",
+                     color = "Search Term") +
+                theme_classic()
+        }
+        else if(input$plot2 == "hockey"){
+            g_search %>%
+                filter(keyword == "hockey") %>%
+                ggplot(aes(date, hits, color = keyword)) + geom_path() +
+                labs(title = "Google Search Hits Over Time",
+                     x = "Date",
+                     y = "Hits (Normalized to Scale of 100)",
+                     color = "Search Term") +
+                theme_classic()
+        }
+        else if(input$plot2 == "concussion"){
+            g_search %>%
+                filter(keyword == "concussion") %>%
+                ggplot(aes(date, hits, color = keyword)) + geom_path() +
+                labs(title = "Google Search Hits Over Time",
+                     x = "Date",
+                     y = "Hits (Normalized to Scale of 100)",
+                     color = "Search Term") +
+                theme_classic()
+        }
+        else if(input$plot2 == "cte"){
+            g_search %>%
+                filter(keyword == "CTE") %>%
+                ggplot(aes(date, hits, color = keyword)) + geom_path() +
+                labs(title = "Google Search Hits Over Time",
+                     x = "Date",
+                     y = "Hits (Normalized to Scale of 100)",
+                     color = "Search Term") +
+                theme_classic()
+        }
+        else if(input$plot2 == "tbi"){
+            g_search %>%
+                filter(keyword == "TBI") %>%
+                ggplot(aes(date, hits, color = keyword)) + geom_path() +
+                labs(title = "Google Search Hits Over Time",
+                     x = "Date",
+                     y = "Hits (Normalized to Scale of 100)",
+                     color = "Search Term") +
+                theme_classic()
+        }
+})
+    output$google_plot2 <- renderPlot({if(input$plot4 == "'basketball concussion'"){
+        g_search2 %>%
+            filter(keyword == "'basketball concussion'") %>%
+            ggplot(aes(date, hits, color = keyword)) + geom_path() +
+            labs(title = "Google Search Hits Over Time",
+                 x = "Date",
+                 y = "Hits (Normalized to Scale of 100)",
+                 color = "Search Term") +
+            theme_classic()
+    }
+        else if(input$plot4 == "'football concussion'"){
+            g_search2 %>%
+                filter(keyword == "'football concussion'") %>%
+                ggplot(aes(date, hits, color = keyword)) + geom_path() +
+                labs(title = "Google Search Hits Over Time",
+                     x = "Date",
+                     y = "Hits (Normalized to Scale of 100)",
+                     color = "Search Term") +
+                theme_classic()
+        }
+        else if(input$plot4 == "'rugby concussion'"){
+            g_search2 %>%
+                filter(keyword == "'rugby concussion'") %>%
+                ggplot(aes(date, hits, color = keyword)) + geom_path() +
+                labs(title = "Google Search Hits Over Time",
+                     x = "Date",
+                     y = "Hits (Normalized to Scale of 100)",
+                     color = "Search Term") +
+                theme_classic()
+        }
+        else if(input$plot4 == "'soccer concussion'"){
+            g_search2 %>%
+                filter(keyword == "'soccer concussion'") %>%
+                ggplot(aes(date, hits, color = keyword)) + geom_path() +
+                labs(title = "Google Search Hits Over Time",
+                     x = "Date",
+                     y = "Hits (Normalized to Scale of 100)",
+                     color = "Search Term") +
+                theme_classic()
+        }
+        else if(input$plot4 == "'hockey concussion'"){
+            g_search2 %>%
+                filter(keyword == "'hockey concussion'") %>%
+                ggplot(aes(date, hits, color = keyword)) + geom_path() +
+                labs(title = "Google Search Hits Over Time",
+                     x = "Date",
+                     y = "Hits (Normalized to Scale of 100)",
+                     color = "Search Term") +
+                theme_classic()
+        }
+})
 
     #### FOOTNOTES
 
