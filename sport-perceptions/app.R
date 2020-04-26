@@ -31,6 +31,24 @@ ui <- navbarPage(
     "Perceptions of Sports and Injuries",
     theme = shinytheme("darkly"),
 
+    #### DATA
+
+    tabPanel("Graphics",
+             tabsetPanel(
+                 tabPanel("Proportions of Tweets",
+                          h3("Associations of Tweeting About a Sport and Injuries"),
+                          sidebarPanel(
+                              helpText("Select to compare between:"),
+                              span(),
+                              selectInput("plot1", "Different Comparisons:",
+                                          choices = list("Sports" = "sports",
+                                                         "Organizations" = "organ",
+                                                         "Rugby" = "rugby",
+                                                         "Football" = "football",
+                                                         "NCAA" = "ncaa"),
+                                          selected = "Sports")),
+                          mainPanel(plotOutput("proportions_plot"))))),
+
     #### ABOUT
 
     tabPanel("About",
@@ -77,24 +95,6 @@ ui <- navbarPage(
 
 
              ))),
-
-    #### DATA
-
-    tabPanel("Graphics",
-             tabsetPanel(
-             tabPanel("Proportions of Tweets",
-                      h3("Associations of Tweeting About a Sport and Injuries"),
-                      sidebarPanel(
-                          helpText("Select to compare between:"),
-                          span(),
-                          selectInput("plot1", "Different Comparisons:",
-                                      choices = list("Sports" = "sports",
-                                                     "Organizations" = "organ",
-                                                     "Rugby" = "rugby",
-                                                     "Football" = "football",
-                                                     "NCAA" = "ncaa"),
-                                      selected = "Sports")),
-                      mainPanel(plotOutput("proportions_plot"))))),
 
     #### WORDS
 
